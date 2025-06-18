@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML3D</title>
+  <link rel="shortcut icon" type="image/x-png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACXSURBVFhH7ZJBDoAgDAT5Ex/0gfxJ46GJLmxbMAESe5gL6Y5zMOWcz5UkfJhNBFQBRyldsC16Ga8AlHvp3S4PkM1+ASMikeGbBQ2wQJHI8M1iSoC1uYmAvQNwxGC3mscMwIEGu9dcEWAGsGELdqt5XAEtUBQBEaAFaNAAPPQwsmsG4JGXke2/A57f/PwPsC16GVXAbCLgAsl4Px2oefF5AAAAAElFTkSuQmCC">
+  <style>
+    a, a:link, a:visited, a:hover, a:active {
+      text-decoration: inherit;
+      font-family: inherit;
+      font-size: inherit;
+      background-color: inherit;
+      color: inherit;
+    }
+  </style>
+</head>
+<body style="margin: 0; overflow: hidden; background-color: #b5e7f7; font-family: Arial, sans-serif;">
+  <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 50%; background-color: #F2DEC4;"></div>
+  <div id="container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+  <div id="headerpanel" style="position: absolute; top: 0; left: 0; width: 100%; height: 40px; background-color: #333333;">
+    <div style="position: absolute; left: 20px; top: 0px; width: 200px; height: 40px; color: #cccccc;">
+      <a href="https://HTML3D.com/"><span style="color: #80cccc; font-size: 16px; line-height: 40px;">HTML3D</span></a>
+    </div>
+    <div id="toggleSound" title="enable/disable sounds" style="position: absolute; left: 230px; top: 0px; width: 40px; height: 40px; background-color: transparent; overflow: hidden; cursor: pointer;">
+    </div>
+    <div title="HTML3D at GitHub" style="position: absolute; left: 290px; top: 10px; width: 20px; height: 20px; background-color: transparent; overflow: hidden; cursor: pointer;">
+      <a href="https://github.com/TimSamshuijzen/HTML3D" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 1024 1024" style="width: 20px; height: 20px; background-color: transparent;">
+          <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z" transform="scale(64)" />
+        </svg>
+      </a>
+    </div>
+  </div>
+  <script>
+
+// Code sections:
+//   HTML3D - Library for creating interactive 3D scenes with HTML elements
+//   AUDIO - Setup audio
+//   SCENE - Define the scene
+
+
+// =====================================================================
+// HTML3D
+
+class HTML3D {
+  constructor(container, scene) {
+    this.camera = {
+      x: ((typeof scene?.camera?.x === 'number') ? scene.camera.x : 0),
+      y: ((typeof scene?.camera?.y === 'number') ? scene.camera.y : 0),
+      z: ((typeof scene?.camera?.z === 'number') ? scene.camera.z : 0),
+      rotationX: ((typeof scene?.camera?.rotationX === 'number') ? scene.camera.rotationX : 0),
+      rotationY: ((typeof scene?.camera?.rotationY === 'number') ? scene.camera.rotationY : 0),
+      collisionWidth: ((typeof scene?.camera?.collisionWidth === 'number') ? scene.camera.collisionWidth : 300),
+      collisionHeight: ((typeof scene?.camera?.collisionHeight === 'number') ? scene.camera.collisionHeight : 600),
+      fov: ((typeof scene?.camera?.fov === 'number') ? scene.camera.fov : 70),
+      worldMatrix: new HTML3D.Matrix4(),
+      viewMatrix: new HTML3D.Matrix4(),
+      updateWorldMatrix() {
+        this.worldMatrix.setTranslate(this.x, this.y, this.z);
+        this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateY(this.rotationY));
+        this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateX(this.rotationX));
+      }
+    };
+    this.camera.updateWorldMatrix();
+    this.container = container;
+    this.cameraContainer = document.createElement('div');
+    Object.assign(this.cameraContainer.style, {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none'
+    });
+    this.container.appendChild(this.cameraContainer);
+    this.sceneContainer = document.createElement('div');
+    Object.assign(this.sceneContainer.style, {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      transformStyle: 'preserve-3d'
+    });
+    this.cameraContainer.appendChild(this.sceneContainer);
+    this.panels = [];
+    if (Array.isArray(scene?.panels)) {
+      for (const scenePanel of scene.panels) {
+        const panel = new HTML3D.Panel(this, scenePanel);
+        this.panels.push(panel);
+      }
+    }
+    for (const panel of this.panels) {
+      if (panel.init !== null) {
+        panel.init(this, panel);
+      }
+    }
+    this.requestRender = true;
+    this.keyboard = {};
+    document.addEventListener('keydown', (event) => {
+      if ((document.activeElement.tagName !== 'TEXTAREA') && (document.activeElement.tagName !== 'INPUT')) {
+        this.keyboard[event.code] = true;
+        // In some rare cases the keyup event is not triggered, so we help the user get out of the stuck keys situation.
+        if (event.code === 'Escape') {
+          this.keyboard = {};
+        } else if ((event.code === 'ArrowLeft') || (event.code === this.keyboard['KeyA'])) {
+          this.keyboard['ArrowRight'] = false;
+          this.keyboard['KeyD'] = false;
+        } else if ((event.code === 'ArrowRight') || (event.code === this.keyboard['KeyD'])) {
+          this.keyboard['ArrowLeft'] = false;
+          this.keyboard['KeyA'] = false;
+        } else if ((event.code === 'ArrowUp') || (event.code === this.keyboard['KeyW'])) {
+          this.keyboard['ArrowDown'] = false;
+          this.keyboard['KeyS'] = false;
+        } else if ((event.code === 'ArrowDown') || (event.code === this.keyboard['KeyS'])) {
+          this.keyboard['ArrowUp'] = false;
+          this.keyboard['KeyW'] = false;
+        } else if (event.code === 'KeyZ') {
+          this.keyboard['KeyX'] = false;
+        } else if (event.code === 'KeyX') {
+          this.keyboard['KeyZ'] = false;
+        }
+      }
+    });
+    document.addEventListener('keyup', (event) => { 
+      this.keyboard[event.code] = false; 
+    });
+    window.addEventListener('resize', () => { this.requestRender = true; });
+    this._thread();
+  }
+  export() {
+    return {
+      camera: {
+        x: this.camera.x,
+        y: this.camera.y,
+        z: this.camera.z,
+        rotationX: this.camera.rotationX,
+        rotationY: this.camera.rotationY,
+        collisionWidth: this.camera.collisionWidth,
+        collisionHeight: this.camera.collisionHeight,
+        fov: this.camera.fov
+      },
+      panels: this.panels.map((panel) => {
+        return panel.export();
+      })
+    };
+  }
+  import(scene) {
+    for (const panel of this.panels) {
+      panel.element.remove();
+    }
+    this.panels = [];
+    if (scene?.camera) {
+      this.camera.x = (scene.camera.x !== undefined) ? scene.camera.x : 0;
+      this.camera.y = (scene.camera.y !== undefined) ? scene.camera.y : 0;
+      this.camera.z = (scene.camera.z !== undefined) ? scene.camera.z : 0;
+      this.camera.rotationX = (scene.camera.rotationX !== undefined) ? scene.camera.rotationX : 0;
+      this.camera.rotationY = (scene.camera.rotationY !== undefined) ? scene.camera.rotationY : 0;
+      this.camera.collisionWidth = (scene.camera.collisionWidth !== undefined) ? scene.camera.collisionWidth : 300;
+      this.camera.collisionHeight = (scene.camera.collisionHeight !== undefined) ? scene.camera.collisionHeight : 700;
+      this.camera.fov = (scene.camera.fov !== undefined) ? scene.camera.fov : 70;
+      this.camera.updateWorldMatrix();
+    }
+    if (Array.isArray(scene?.panels)) {
+      for (const panelData of scene.panels) {
+        this.panels.push(new HTML3D.Panel(this, panelData));
+      }
+    }
+    for (const panel of this.panels) {
+      if (panel.init !== null) {
+        panel.init(this, panel);
+      }
+    }
+    this.requestRender = true;
+  }
+  render() {
+    const innerWidth = this.container.clientWidth;
+    const innerHeight = this.container.clientHeight;
+    const focalLength = (0.5 * innerHeight) / Math.tan((this.camera.fov * 0.5 * Math.PI) / 180);
+    this.camera.viewMatrix.setMatrix(this.camera.worldMatrix).invert();
+    this.sceneContainer.style.transform = `perspective(${focalLength}px) translateZ(${focalLength}px) ${this.camera.viewMatrix.toCSSMatrixString()} translate(${innerWidth / 2}px, ${innerHeight / 2}px)`;
+    for (let i = 0, c = this.panels.length; i < c; i++) {
+      this.panels[i].render();
+    }
+  }
+  _thread() {
+    if (this._moveCamera()) {
+      this.requestRender = true;
+    }
+    if (this.requestRender) {
+      this.requestRender = false;
+      this.render();
+    }
+    for (let i = 0, c = this.panels.length; i < c; i++) {
+      const panel = this.panels[i];
+      if (panel.animate !== null) {
+        panel.animate(this, panel);
+      }
+    }
+    requestAnimationFrame(() => this._thread());
+  }
+  _moveCamera() {
+    let result = false;
+    const moveSpeed = 2500 * (1 / 60);
+    const rotateSpeed = (Math.PI * 0.5) * (1 / 60);
+    const forward = new HTML3D.Vector3(0, 0, -1);
+    forward.applyMatrix4Rotation(this.camera.worldMatrix);
+    forward.y = 0;
+    forward.normalize();
+    const right = new HTML3D.Vector3(this.camera.worldMatrix.elements[0], this.camera.worldMatrix.elements[1], this.camera.worldMatrix.elements[2]);
+    right.y = 0;
+    right.normalize();
+    if ((this.keyboard['ArrowLeft']) || (this.keyboard['KeyA'])) {
+      this.camera.rotationY += rotateSpeed;
+      result = true;
+    }
+    if ((this.keyboard['ArrowRight']) || (this.keyboard['KeyD'])) {
+      this.camera.rotationY -= rotateSpeed;
+      result = true;
+    }
+    const intendedMove = new HTML3D.Vector3(0, 0, 0);
+    if ((this.keyboard['ArrowUp']) || (this.keyboard['KeyW'])) {
+      intendedMove.add(forward);
+    }
+    if ((this.keyboard['ArrowDown']) || (this.keyboard['KeyS'])) {
+      intendedMove.sub(forward);
+    }
+    if (this.keyboard['KeyZ']) { 
+      intendedMove.sub(right); 
+    }
+    if (this.keyboard['KeyX']) { 
+      intendedMove.add(right);
+    }
+    if (intendedMove.lengthSq() > 0) {
+      intendedMove.normalize();
+      intendedMove.multiplyScalar(moveSpeed);
+      const finalMove = intendedMove.clone();
+      const moveX = new HTML3D.Vector3(intendedMove.x, 0, 0);
+      if (this._checkAABBCollision(moveX)) {
+        finalMove.x = 0;
+      }
+      const moveZ = new HTML3D.Vector3(0, 0, intendedMove.z);
+      if (this._checkAABBCollision(moveZ)) {
+        finalMove.z = 0;
+      }
+      if (finalMove.lengthSq() > 0) {
+        result = true;
+        this.camera.x += finalMove.x;
+        this.camera.y += finalMove.y;
+        this.camera.z += finalMove.z;
+      }
+    }
+    if (result) {
+      this.camera.updateWorldMatrix();
+    }
+    return result;
+  }
+  _checkAABBCollision(moveDirection) {
+    const targetPosition = new HTML3D.Vector3(this.camera.x, this.camera.y, this.camera.z);
+    targetPosition.add(moveDirection);
+    const halfCameraWidth = (this.camera.collisionWidth / 2);
+    const cameraBoundingBox = new HTML3D.BoundingBox(
+      new HTML3D.Vector3(targetPosition.x - halfCameraWidth, (targetPosition.y - 10), targetPosition.z - halfCameraWidth),
+      new HTML3D.Vector3(targetPosition.x + halfCameraWidth, (targetPosition.y + this.camera.collisionHeight), targetPosition.z + halfCameraWidth)
+    );
+    for (let i = 0, c = this.panels.length; i < c; i++) {
+      const panel = this.panels[i];
+      if (panel.boundingBox) {
+        if (cameraBoundingBox.intersectsBox(panel.boundingBox)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+}
+{
+  HTML3D.Panel = class Panel {
+    constructor(html3d, scenePanel) {
+      this.html3d = html3d;
+      Object.assign(this, {
+        id: ((typeof scenePanel.id === 'string') ? scenePanel.id : null),
+        relativeToId: ((typeof scenePanel.relativeToId === 'string') ? scenePanel.relativeToId : null),
+        title: ((typeof scenePanel.title === 'string') ? scenePanel.title : null),
+        width: ((typeof scenePanel.width === 'number') ? scenePanel.width : 100),
+        height: ((typeof scenePanel.height === 'number') ? scenePanel.height : 100),
+        anchorCenter: ((typeof scenePanel.anchorCenter === 'boolean') ? scenePanel.anchorCenter : false),
+        x: ((typeof scenePanel.x === 'number') ? scenePanel.x : 0),
+        y: ((typeof scenePanel.y === 'number') ? scenePanel.y : 0),
+        z: ((typeof scenePanel.z === 'number') ? scenePanel.z : 0),
+        rotationX: ((typeof scenePanel.rotationX === 'number') ? scenePanel.rotationX : 0),
+        rotationY: ((typeof scenePanel.rotationY === 'number') ? scenePanel.rotationY : 0),
+        backgroundColor: ((typeof scenePanel.backgroundColor === 'string') ? scenePanel.backgroundColor : 'transparent'),
+        backgroundImage: ((typeof scenePanel.backgroundImage === 'string') ? scenePanel.backgroundImage : null),
+        backgroundTileImage: ((typeof scenePanel.backgroundTileImage === 'string') ? scenePanel.backgroundTileImage : null),
+        opacity: ((typeof scenePanel.opacity === 'number') ? scenePanel.opacity : null),
+        obstruction: ((typeof scenePanel.obstruction === 'boolean') ? scenePanel.obstruction : false),
+        interaction: ((typeof scenePanel.interaction === 'boolean') ? scenePanel.interaction : false),
+        innerHTML: ((typeof scenePanel.innerHTML === 'string') ? scenePanel.innerHTML : null),
+        iframeSrc: ((typeof scenePanel.iframeSrc === 'string') ? scenePanel.iframeSrc : null),
+        iframeHtml: ((typeof scenePanel.iframeHtml === 'string') ? scenePanel.iframeHtml : null),
+        userData: ((typeof scenePanel.userData === 'object') ? scenePanel.userData : null),
+        init: ((typeof scenePanel.init === 'function') ? scenePanel.init : null),
+        click: ((typeof scenePanel.click === 'function') ? scenePanel.click : null),
+        animate: ((typeof scenePanel.animate === 'function') ? scenePanel.animate : null)
+      });
+      if (typeof scenePanel.initString === 'string') {
+        try {
+          this.init = new Function('html3d', 'panel', scenePanel.initString);
+        } catch (e) {
+          this.init = null;
+        }
+      }
+      if (typeof scenePanel.clickString === 'string') {
+        try {
+          this.click = new Function('html3d', 'panel', scenePanel.clickString);
+        } catch (e) {
+          this.click = null;
+        }
+      }
+      if (typeof scenePanel.animateString === 'string') {
+        try { 
+          this.animate = new Function('html3d', 'panel', scenePanel.animateString);
+        } catch (e) {
+          this.animate = null;
+        }
+      }
+      this.iframe = null;
+      this.element = document.createElement('div');
+      if (this.id !== null) {
+        this.element.id = this.id;
+      }
+      if (this.title !== null) {
+        this.element.title = this.title;
+      }
+      Object.assign(this.element.style, {
+        position: 'absolute',
+        width: this.width + 'px',
+        height: this.height + 'px',
+        backgroundColor: this.backgroundColor,
+        pointerEvents: (((this.interaction === true) || (this.obstruction === true)) ? 'auto' : 'none'),
+        userSelect: ((this.interaction === true) ? 'auto' : 'none')
+      });
+      html3d.sceneContainer.appendChild(this.element);
+      if (this.innerHTML !== null) {
+        this.element.innerHTML = this.innerHTML;
+      } else if ((this.iframeSrc !== null) || (this.iframeHtml !== null)) {
+        this.element.style.width = (this.width - 6) + 'px';
+        this.element.style.height = (this.height - 6) + 'px';
+        this.element.style.border = '3px solid ' + this.backgroundColor;
+        this.iframe = document.createElement('iframe');
+        this.iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        if (this.iframeSrc !== null) {
+          this.iframe.src = this.iframeSrc;
+        } else if (this.iframeHtml !== null) {
+          this.iframe.srcdoc = this.iframeHtml;
+        }
+        Object.assign(this.iframe.style, {
+          position: 'absolute',
+          left: '0px',
+          top: '0px',
+          width: (this.width - 6) + 'px',
+          height: (this.height - 6) + 'px',
+          border: 'none'
+        });
+        this.element.appendChild(this.iframe);
+      } else if (this.backgroundImage !== null) {
+        this.element.style.backgroundImage = this.backgroundImage;
+        this.element.style.backgroundSize = 'contain';
+        this.element.style.backgroundPosition = 'center';
+        this.element.style.backgroundRepeat = 'no-repeat';
+      } else if (this.backgroundTileImage !== null) {
+        this.element.style.backgroundImage = this.backgroundTileImage;
+        this.element.style.backgroundRepeat = 'repeat';
+      }
+      if (this.opacity !== null) {
+        this.element.style.opacity = this.opacity;
+      }
+      if (this.click !== null) {
+        this.element.style.cursor = 'pointer';
+        this.element.addEventListener('click', (event) => {
+          event.stopPropagation();
+          this.click(html3d, this);
+        });
+      }
+      this.worldMatrix = new HTML3D.Matrix4();
+      this.boundingBox = null;
+      this.updateWorldMatrix();
+    }
+    export() {
+      const panelData = {
+        id: (this.id !== null) ? this.id : undefined,
+        relativeToId: (this.relativeToId !== null) ? this.relativeToId : undefined,
+        title: (this.title !== null) ? this.title : undefined,
+        width: this.width,
+        height: this.height,
+        anchorCenter: (this.anchorCenter === true) ? this.anchorCenter : undefined,
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        rotationX: (this.rotationX !== 0) ? this.rotationX : undefined,
+        rotationY: (this.rotationY !== 0) ? this.rotationY : undefined,
+        backgroundColor: this.backgroundColor,
+        backgroundImage: (this.backgroundImage !== null) ? this.backgroundImage : undefined,
+        backgroundTileImage: (this.backgroundTileImage !== null) ? this.backgroundTileImage : undefined,
+        opacity: (this.opacity !== null) ? this.opacity : undefined,
+        obstruction: (this.obstruction !== null) ? this.obstruction : undefined,
+        interaction: (this.interaction !== null) ? this.interaction : undefined,
+        innerHTML: (this.innerHTML !== null) ? this.innerHTML.trim() : undefined,
+        iframeSrc: (this.iframeSrc !== null) ? this.iframeSrc : undefined,
+        iframeHtml: (this.iframeHtml !== null) ? this.iframeHtml : undefined
+      };
+      if (this.userData !== null) {
+        panelData.userData = {};
+        for (const key in this.userData) {
+          if (this.userData.hasOwnProperty(key)) {
+            panelData.userData[key] = this.userData[key];
+          }
+        }
+      }
+      if (this.init !== null) {
+        panelData.initString = this.init.toString();
+        panelData.initString = panelData.initString.substring(panelData.initString.indexOf('{') + 1, panelData.initString.lastIndexOf('}')).trim();
+      }
+      if (this.click !== null) {
+        panelData.clickString = this.click.toString();
+        panelData.clickString = panelData.clickString.substring(panelData.clickString.indexOf('{') + 1, panelData.clickString.lastIndexOf('}')).trim();
+      }
+      if (this.animate !== null) {
+        panelData.animateString = this.animate.toString();
+        panelData.animateString = panelData.animateString.substring(panelData.animateString.indexOf('{') + 1, panelData.animateString.lastIndexOf('}')).trim();
+      }
+      return panelData;
+    }
+    updateWorldMatrix() {
+      this.worldMatrix.reset();
+      if (this.relativeToId !== null) {
+        const relativeToPanel = this.html3d.panels.find((panel) => panel.id === this.relativeToId);
+        if (relativeToPanel) {
+          this.worldMatrix.setMatrix(relativeToPanel.worldMatrix);
+        }
+      }
+      this.worldMatrix.multiply(new HTML3D.Matrix4().setTranslate(this.x, this.y, this.z)).multiply(new HTML3D.Matrix4().setRotateY(this.rotationY)).multiply(new HTML3D.Matrix4().setRotateX(this.rotationX));
+      if (this.obstruction === true) {
+        const eitherSide = 10;
+        if (this.anchorCenter === true) {
+          this.boundingBox = new HTML3D.BoundingBox(
+            new HTML3D.Vector3(-this.width / 2, -this.height / 2, -eitherSide),
+            new HTML3D.Vector3(this.width / 2, this.height / 2, eitherSide)
+          );
+        } else {
+          this.boundingBox = new HTML3D.BoundingBox(
+            new HTML3D.Vector3(0, 0, -eitherSide),
+            new HTML3D.Vector3(this.width, this.height, eitherSide)
+          );
+        }
+        this.boundingBox.applyMatrix4(this.worldMatrix);
+      } else {
+        this.boundingBox = null;
+      }
+      for (const panel of this.html3d.panels) {
+        if (panel.relativeToId === this.id) {
+          panel.updateWorldMatrix();
+        }
+      }
+    }
+    render() {
+      this.element.style.transform = `translate(-50%, -50%) ${this.worldMatrix.toCSSMatrixString()}${this.anchorCenter ? '' : ' translate(50%, 50%)'}`;
+    }
+  }
+  HTML3D.Vector3 = class Vector3 {
+    constructor(x = 0, y = 0, z = 0) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+    }
+    set(x, y, z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      return this;
+    }
+    clone() {
+      return new HTML3D.Vector3(this.x, this.y, this.z);
+    }
+    add(v) {
+      this.x += v.x;
+      this.y += v.y;
+      this.z += v.z;
+      return this;
+    }
+    sub(v) {
+      this.x -= v.x;
+      this.y -= v.y;
+      this.z -= v.z;
+      return this;
+    }
+    multiplyScalar(s) {
+      this.x *= s;
+      this.y *= s;
+      this.z *= s;
+      return this;
+    }
+    lengthSq() {
+      return (this.x * this.x) + (this.y * this.y) + (this.z * this.z);
+    }
+    length() {
+      return Math.sqrt(this.lengthSq());
+    }
+    normalize() {
+      const l = this.length();
+      if (l > 0.00001) {
+        this.multiplyScalar(1 / l);
+      }
+      return this;
+    }
+    applyMatrix4(m) {
+      const x = this.x;
+      const y = this.y;
+      const z = this.z;
+      const e = m.elements;
+      const w = 1 / (e[3] * x + e[7] * y + e[11] * z + e[15]);
+      this.x = (e[0] * x + e[4] * y + e[8] * z + e[12]) * w;
+      this.y = (e[1] * x + e[5] * y + e[9] * z + e[13]) * w;
+      this.z = (e[2] * x + e[6] * y + e[10] * z + e[14]) * w;
+      return this;
+    }
+    applyMatrix4Rotation(m) {
+      const x = this.x;
+      const y = this.y;
+      const z = this.z;
+      const e = m.elements;
+      this.x = e[0] * x + e[4] * y + e[8] * z;
+      this.y = e[1] * x + e[5] * y + e[9] * z;
+      this.z = e[2] * x + e[6] * y + e[10] * z;
+      return this.normalize();
+    }
+    dot(v) {
+      return (this.x * v.x) + (this.y * v.y) + (this.z * v.z);
+    }
+  }
+  HTML3D.Matrix4 = class Matrix4 {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.elements = [
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      ];
+      return this;
+    }
+    set(n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44) {
+      const te = this.elements;
+      te[0] = n11; te[4] = n12; te[8] = n13; te[12] = n14;
+      te[1] = n21; te[5] = n22; te[9] = n23; te[13] = n24;
+      te[2] = n31; te[6] = n32; te[10] = n33; te[14] = n34;
+      te[3] = n41; te[7] = n42; te[11] = n43; te[15] = n44;
+      return this;
+    }
+    setMatrix(m) {
+      this.elements = [...m.elements];
+      return this;
+    }
+    clone() {
+      const newMatrix = new HTML3D.Matrix4();
+      newMatrix.elements = [...this.elements];
+      return newMatrix;
+    }
+    setTranslate(x, y, z) {
+      return this.set(
+        1, 0, 0, x,
+        0, 1, 0, y,
+        0, 0, 1, z,
+        0, 0, 0, 1
+      );
+    }
+    setRotateX(theta) {
+      const c = Math.cos(theta);
+      const s = Math.sin(theta);
+      return this.set(
+        1, 0, 0, 0,
+        0, c, -s, 0,
+        0, s, c, 0,
+        0, 0, 0, 1
+      );
+    }
+    setRotateY(theta) {
+      const c = Math.cos(theta);
+      const s = Math.sin(theta);
+      return this.set(
+        c, 0, s, 0,
+        0, 1, 0, 0,
+        -s, 0, c, 0,
+        0, 0, 0, 1
+      );
+    }
+    multiply(m) {
+      const me = m.elements;
+      const te = this.elements;
+      const a11 = te[0], a12 = te[4], a13 = te[8], a14 = te[12];
+      const a21 = te[1], a22 = te[5], a23 = te[9], a24 = te[13];
+      const a31 = te[2], a32 = te[6], a33 = te[10], a34 = te[14];
+      const a41 = te[3], a42 = te[7], a43 = te[11], a44 = te[15];
+      const b11 = me[0], b12 = me[4], b13 = me[8], b14 = me[12];
+      const b21 = me[1], b22 = me[5], b23 = me[9], b24 = me[13];
+      const b31 = me[2], b32 = me[6], b33 = me[10], b34 = me[14];
+      const b41 = me[3], b42 = me[7], b43 = me[11], b44 = me[15];
+      te[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+      te[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+      te[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+      te[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+      te[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+      te[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+      te[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+      te[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+      te[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+      te[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+      te[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+      te[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+      te[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+      te[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+      te[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+      te[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+      return this;
+    }
+    invert() {
+      const te = this.elements;
+      const r11 = te[0], r12 = te[4], r13 = te[8];
+      const r21 = te[1], r22 = te[5], r23 = te[9];
+      const r31 = te[2], r32 = te[6], r33 = te[10];
+      const tx = te[12], ty = te[13], tz = te[14];
+      te[0] = r11; te[4] = r21; te[8] = r31;
+      te[1] = r12; te[5] = r22; te[9] = r32;
+      te[2] = r13; te[6] = r23; te[10] = r33;
+      te[12] = -(te[0] * tx + te[4] * ty + te[8] * tz);
+      te[13] = -(te[1] * tx + te[5] * ty + te[9] * tz);
+      te[14] = -(te[2] * tx + te[6] * ty + te[10] * tz);
+      return this;
+    }
+    toCSSMatrixString() {
+      const e = this.elements;
+      return 'matrix3d(' +
+        e[0] + ',' + e[1] + ',' + e[2] + ',' + e[3] + ',' +
+        e[4] + ',' + e[5] + ',' + e[6] + ',' + e[7] + ',' +
+        e[8] + ',' + e[9] + ',' + e[10] + ',' + e[11] + ',' +
+        e[12] + ',' + e[13] + ',' + e[14] + ',' + e[15] +
+        ')';
+    }
+  }
+  HTML3D.BoundingBox = class BoundingBox {
+    constructor(min = new HTML3D.Vector3(+Infinity, +Infinity, +Infinity), max = new HTML3D.Vector3(-Infinity, -Infinity, -Infinity)) {
+      this.min = min;
+      this.max = max;
+    }
+    applyMatrix4(matrix) {
+      const points = [
+        new HTML3D.Vector3(this.min.x, this.min.y, this.min.z),
+        new HTML3D.Vector3(this.min.x, this.min.y, this.max.z),
+        new HTML3D.Vector3(this.min.x, this.max.y, this.min.z),
+        new HTML3D.Vector3(this.min.x, this.max.y, this.max.z),
+        new HTML3D.Vector3(this.max.x, this.min.y, this.min.z),
+        new HTML3D.Vector3(this.max.x, this.min.y, this.max.z),
+        new HTML3D.Vector3(this.max.x, this.max.y, this.min.z),
+        new HTML3D.Vector3(this.max.x, this.max.y, this.max.z),
+      ];
+      this.min.set(+Infinity, +Infinity, +Infinity);
+      this.max.set(-Infinity, -Infinity, -Infinity);
+      for (let i = 0; i < 8; i++) {
+        points[i].applyMatrix4(matrix);
+        this.min.x = Math.min(this.min.x, points[i].x);
+        this.min.y = Math.min(this.min.y, points[i].y);
+        this.min.z = Math.min(this.min.z, points[i].z);
+        this.max.x = Math.max(this.max.x, points[i].x);
+        this.max.y = Math.max(this.max.y, points[i].y);
+        this.max.z = Math.max(this.max.z, points[i].z);
+      }
+      return this;
+    }
+    intersectsBox(box) {
+      return this.max.x >= box.min.x && this.min.x <= box.max.x &&
+        this.max.y >= box.min.y && this.min.y <= box.max.y &&
+        this.max.z >= box.min.z && this.min.z <= box.max.z;
+    }
+  }
+}
+
+// =====================================================================
+// AUDIO
+
+const AUDIO = {
+  init() {
+    this.enabled = true;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    this.audioCtx = new AudioCtx();
+    this.audioCtxMainGain = this.audioCtx.createGain();
+    this.audioCtxMainGainVolume = 0.6;
+    this.audioCtxMainGain.connect(this.audioCtx.destination);
+    this.audioCtxMainGain.gain.setValueAtTime(this.audioCtxMainGainVolume, this.audioCtx.currentTime);
+    this.samples = {
+      // sample sound from lichess.org
+      soundOn: new Audio('data:audio/mpeg;base64,SUQzAwAAAAABHVRJVDIAAAAPAAAAaW5jb21pbmctcmpzLTFUWFhYAAAAegAAAFRYWFgAIDAwMDAwMDAwIDAwMDAwMjEwIDAwMDAwODhGIDAwMDAwMDAwMDAwMDVDRTEgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDAgMDAwMDAwMDD/40jEAAAAAAAAAAAAWGluZwAAAA8AAAAJAAAKaAAuLi4uLi4uLi4uLlVVVVVVVVVVVVVVZGRkZGRkZGRkZGR0dHR0dHR0dHR0dJubm5ubm5ubm5ubycnJycnJycnJycng4ODg4ODg4ODg4Pj4+Pj4+Pj4+Pj4//////////////8AAAA8TEFNRTMuMTAwBCgAAAAAAAAAABUIJAQfIQABzAAACmhJFBIL' + 'A'.repeat(158) + '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' + 'V'.repeat(48) + 'X/4zjE8TCLMnMZmJkAVVVVVVVVVUxBTUUzLjEwMF' + 'V'.repeat(248) + 'X/4xjExAAAA0gBwAAA' + 'V'.repeat(78) + 'U='),
+      // sample sounds from Defender arcade game
+      newGame: new Audio('data:audio/mpeg;base64,/+NIxAAAAAAAAAAAAFhpbmcAAAAPAAAAHAAAFjgADQ0NGxsbGygoKDMzMzM6OjpAQEBAR0dHUVFRUVhYWFhiYmJpaWlpcHBwd3d3d4GBgYiIiIiPj4+PlpaWnZ2dnaenp66urq60tLS/v7+/xcXFxczMzNfX19fu7u78/Pz8////AAAAPExBTUUzLjEwMAQoAAAAAAAAAAAVCCQENyEAAcwAABY4xFzfB' + 'A'.repeat(159) + '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' + 'q'.repeat(249) + '/+MYxMQAAANIAcAAAK' + 'q'.repeat(78)),
+      copyIntoGame: new Audio('data:audio/mpeg;base64,/+NIxAAAAAAAAAAAAFhpbmcAAAAPAAAADwAAEFAAEhISEhISNDQ0NDQ0NFBQUFBQUHFxcXFxcXF7e3t7e3t7hISEhISEkpKSkpKSkpycnJycnJyqqqqqqqq0tLS0tLS0vb29vb29vcfHx8fHx+jo6Ojo6Oj7+/v7+/v7////////AAAAPExBTUUzLjEwMAQoAAAAAAAAAAAVCCQDUyEAAcwAABBQloMBq' + 'A'.repeat(159) + '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' + 'q'.repeat(245) + '/+MYxMEAAAP8AcAAAK' + 'q'.repeat(78)),
+      teleportIntoGame: new Audio('data:audio/mpeg;base64,/+NIxAAAAAAAAAAAAFhpbmcAAAAPAAAAEQAADPAAGBgYGBgwMDAwMDA8PDw8PDxPT09PT09bW1tbW1tnZ2dnZ2dzc3Nzc3OAgICAgICMjIyMjJiYmJiYmKSkpKSkpLCwsLCwsMPDw8PDw8/Pz8/Pz9vb29vb2/Pz8/Pz8///////AAAAPExBTUUzLjEwMAQoAAAAAAAAAAAVCCQCdCEAAcwAAAzw0SvkUw' + 'A'.repeat(158) + '/+NIxAASCAb9v0EAAFCnbJtvuAAOCDoIS4Pg4CAIAB0Hwf6wfD//B8/pB8HwffKAg7lDn/KAgc6gQdLg+D5oEAx/9YPg//iAEATB8H////lzQIAgCCo0YIAyGGySVSKSRs04ZOWRmFCkVMINg0QFKpg0BCcGV6A9TV13xUHMfIN4HOwSOBAlTzvqkG0BN9Ccpg1GdT/bGsKsKuBWM4wVJJi2IY7MVRkc30wICPIlw1IDMswI7KJshhuCAZiSi6BvkwJUSLwkPVRJk+TkhaWJgTMt8xblOn2dwVjQeZpDAQ0G0WNRxClM2AL9Zjtce3W9zJg0WtDzycUWaCszZ43DxX1OSGqVs8/f0jN8F+cB/qYy7KVQU0zuqzpN9GUCJR6s/+NIxMpEK8Lq+Zp4ACrbp7wr9rNiFEURkywXNajx7N72KyvXN28S7+si3AoyRpKrjDgqz0TclIrW5vFC4UlibgM7qJBL4u0kd65fwo9s+2cyxYM9hGesccdoAAgHVCIBkDaa0B57TKF+IxQhfBVxdNllgsssUfDik2gFDkumhJgXgiZYQrzKRNEcZUFGIY5Q4ZiQQTFw6cwkcqGRjPUiuQUdjI5XPvt/1aiOafK6EVLjSnORyIjOSjEJdSJpr/5e10ZLkHVVFK9EKhFIjXZmY5mVbpKRtKNM9SkJOcrqpFVRUKrz/JkAv7BEGOXuaW7AARIifW0doHIr+oEsTu4srHpoOyeIQeq1O6YbQNPVVUgTMGSWzS+n7t6z97d2b72Z/+MoxMwlO/cJv8koAaJN/1BAvya9Gv28JmAYGRx3i+Tv05b/+P///z50LqUqUIMVNizWWhnD2/3/tmc/mfxj9pJ1S+si4goQl9uKwmhBZ/YSRivz////zTVSbhKwVycmm57qgpmShaV8dktoABIgckR1KXG0ZWHgpMx0jtSHA4CxaIIJAkcSJiZmYIRKZMJd/+M4xLoj9EMSXkmG0Ro4ehqCSc9n+fm+v6htq0XIPLbtcpH6xdPqVAXmYgmfaFdVNcbuv8TVzCzRgdfkKK+UZYxSn+5Eh5ubpxJ/ft731pEyaPP+mFFoTKx6nWn6FnDKxM6Z/5X7znSL0YXZb9QN5WBiSEOV28AAiw0RSKkwIgRGzhSGRJhIdhgPnjFLZCqFlLLmXDzLJCA01ZLHj4YkBQHeFt14a55bRpr3ZQFZccZikeBUgsUQYEFHAnDI+VIiz37/3PWTUlLPz4358iWmyZESKWDGQSgc/+MoxPUjPB8NvjBHYdMzPvwjy/5MvNjK/1RP2nTRxyIrGJseAmUFqYgGeBmSESnUwKFeKAs95BbCCaVuUzswAC0InFpxu+bttGs2YL6deu0yuXk9Dg+2kJmJciQM2xFcGyMtESCCJN4fAzEM9Uz+/8Py3fHIrl23/Nv4a8N6xG4Dopa/yEbZsPbQQcUsJGU3/+MoxOsk68MN3jIGcUSUuHmZX/L+75/qdf2LbUWAmuDeAGiGEiHgknKecRP/8///8oVLZl+PYSzZeZ2q5bixCg1Pz3mpNd5nlLujkkoAFmHlgclIKMmj4dMgBrIkS3WuFEftylKy85OPksenSBF3SSkiswil2tMn0AAq/32cjVWzOEHBBWaOecE5wxoMxgOH/+MoxNoke+cNvkmG7dhVxYlghHUo9lRn539P/7XeFIRmquYQ7EkQkqoc8xVORiDPv3I/+2/p+nNdq3dyOQUrKMUhoVw8k7krM3vLKpiU7655qABAKKU5Lfe0aYdYRy1fYlyZBzVIEXk6ET9OuDDil2prKs72CEdXKZ7N94HuRdxnd+7EtzW0zAdsJCDlki1j/+MoxMshi/sNHjDFCXI4kB5GkIjcnPJ3OZUzxFt/7C/uXVNTatfP1Pydj6mRTOn8LM/IyOOOgJxGkuc7xi2h1u29jlOabPA08mHxaksSX83ZaAA9ePIWeWtqaZGzE6XVYyZfKydfO2W5ZslSYRLVp/Kfkts42Zf0kTP5zoRR+HrEQeBgky4IQx+x9IuShgYM/+MoxMcgo0sVvjBHIEkXxR0JN43W6pVmq6lHWmspz6xmQJzRnBWJjv+/m/85//nDjXQ0X3I2qk9pBTBq2MlhiiFKwQvhcvDK2GOz999+A/076PymqJ4nyaomkJTRSyAAQYhBOz4rEKexNORLRKifrsyugs4uwIimZR6yn+5u4c3hnIHPtd3Ou49GcDeTGMMi/+MoxMcj41MNvmGGdWH6qlu++31t77ISXyo87KJtSQCN7nP0fI34/5FCY0MjH8EUJyQjPGzyu+Wc7/56o3qrEeZw0nW0+504di5G9Yjc/fN3Uk8sRheEQfyH0WFgU9U44ABU0i8G0AUR5sqqppM2jctRY3bN4h1ENtr7Et2bpJUWRUss1sq8A5btma5SMmKn/+MoxLohO8sNvkmGeH1O3DmHSuSYOe1NNs1rTZiO1SmS3IwtOUp5P2TYqTn9Mc6FB5+xk7cyidLWSi4sYCCnFMSBdLU/lU1NySHFB0iAB4SULwARJhDYEHRKtf820rtJaAAJ0KA7sKyB1nrHlwaEmHHFpkqhGM3G3EYZCw2XlJp+2jjV/SOKtmLrsRMI1ohj/+MoxLggoq8NvkmGsLVhE1SoABwmEGDthxt3SCI5FXsI6MUP7f2Ml1XDB0FVaWpDKtdgxxyuioq3rnkhGmeRJI9UPL5ltJwQgQ+ePIW/zPt7+8YtF1/PWs/oLxv7oiCzDVmtobaJR0bcAARJsh7GUQiNGtgUpyKbaE242ITc5xSJw+6pY0mUDJMzaGEe+UNN/+M4xLgjAtMVvjJGiewh6LpYomrNaENvN2CVXK/tertefx277h4yUKkiIUgnw2TrykkSo4KIW10BxRb13/4WkIiX/tP/86Ya0ovM4GeTkdiMitbpy5BBCw4hEr0DlTCyeYWkN8izXaSo739uxStIHns0RLdkbLrJ1WVWngAh0RNhafuGzg4i1VBOVoatdVUcQIjaW3+pS1JXbNwb6UI0PR0rweVEWq8SaghNNjI3nEdK8vprfPFvtY92yuhdHTk/M6gOp5APTmptloD9JuQaCdGp9XJmy4HP/+MoxPclavsJnkpGfYDRZGOk2mHLt7vdUp4NC50rkSxMCDzgdEM46fAgjawFxY8GAiYuY01VlkksZaChSbj4WegHUUg4LFIRSBMZXywylCyJhBta5f905gvKjUzZRVBLEx3SmbjgliVqUG3jdWRQwnMizAgGnHIe6GCaY7UShkDnufxCj1YUUZh9WY04pTPT/+MoxOQiSjcNnUkwABDH4jjhbV4yjhOI/ylUh+FvPdHomyIahXD/skC5PFkvRflwyiuGMnyeq4uQ2D6QbYrnF9g8rspsmIj5lY2K9cIpXQkYSd8iTnouy8RVCXJwdLs5D0QTe5lxSTxmfNiebUzdkdn+twFKrnNuWm9Vtt1XHq+ba1lRCGtSnUqlQKNHqJVI/+NIxN1Dy8LyUZh4AMJc22GpbNs8r5gcFQ6f95HcXj9dPnsKM8ZotVhllRCIXmWFChK5hboTc26jQaSKWKrtqgVI3Eh2uAaqqlAwEuzMzHxmoUBARK6qvGZl2Zm1AW1VVVV/lK6lLmMZkMZ5Sl1KWhgJkMbKUvoY31KWYzfmNQxnqUv//mM1DP/KVpjf////+htDPlL/9DalK/0MZsxnUol4oK6F/BvRdUxBTUUzLjEwMF' + 'V'.repeat(146) + '/+MoxOAaG/baVcMQA' + 'V'.repeat(175))
+    };
+    this.samples.soundOn.volume = 0.45;
+    this.samples.newGame.volume = 0.15;
+    this.samples.copyIntoGame.volume = 0.15;
+    this.samples.teleportIntoGame.volume = 0.15;
+  },
+  resumeContext() {
+    if (this.audioCtx.state === 'suspended') {
+      return this.audioCtx.resume();
+    }
+    return Promise.resolve();
+  }
+}
+AUDIO.init();
+window.AUDIO_enabled = function() {
+  return AUDIO.enabled;
+};
+window.AUDIO_enable = function(enable) {
+  const toggleSoundButton = document.getElementById('toggleSound');
+  if (enable) {
+    AUDIO.enabled = true;
+    AUDIO.audioCtxMainGainVolume = 0.6;
+    AUDIO.audioCtxMainGain.gain.setValueAtTime(AUDIO.audioCtxMainGainVolume, AUDIO.audioCtx.currentTime);
+    AUDIO.samples.soundOn.volume = 0.45;
+    AUDIO.samples.newGame.volume = 0.15;
+    AUDIO.samples.copyIntoGame.volume = 0.15;
+    AUDIO.samples.teleportIntoGame.volume = 0.15;
+    toggleSoundButton.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" style="position: absolute; left: 8px; top: 8px; width: 24px; height: 24px; background-color: transparent;">
+        <path fill="#ffffff" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
+      </svg>
+    `;
+  } else {
+    AUDIO.enabled = false;
+    AUDIO.audioCtxMainGainVolume = 0;
+    AUDIO.audioCtxMainGain.gain.setValueAtTime(AUDIO.audioCtxMainGainVolume, AUDIO.audioCtx.currentTime);
+    AUDIO.samples.soundOn.volume = 0;
+    AUDIO.samples.newGame.volume = 0;
+    AUDIO.samples.copyIntoGame.volume = 0;
+    AUDIO.samples.teleportIntoGame.volume = 0;
+    toggleSoundButton.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" style="position: absolute; left: 8px; top: 8px; width: 24px; height: 24px; background-color: transparent;">
+        <path fill="#ffffff" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.46 14,18.7V20.77C15.38,20.45 16.63,19.82 17.68,18.96L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.82 18.46,14.64L19.97,16.15C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12C16.5,10.23 15.5,8.71 14,7.97V10.18L16.45,12.63C16.5,12.43 16.5,12.21 16.5,12Z" />
+      </svg>
+    `;
+  }
+};
+AUDIO_enable(true);
+document.getElementById('toggleSound').addEventListener('click', () => {
+  AUDIO_enable(!AUDIO_enabled());
+  if (AUDIO_enabled()) {
+    AUDIO.samples.soundOn.play();
+  }
+});
+
+// =====================================================================
+// SCENE
+
+const pageCode = document.documentElement.outerHTML;
+const cameraHeight = 900;
+const buildingWidth = 10000;
+const buildingDepth = 7500;
+const wallHeight = 1750;
+const doorWidth = 1500;
+const floorDepth = 200;
+const firstFloorWallDepth = 200;
+const firstFloorWindowWidth = (buildingWidth / 2) - 1000;
+const firstFloorWindowHeight = 1000;
+const SCENE = {
+  camera: {
+    x: doorWidth / 2,
+    y: -cameraHeight,
+    z: 10600,
+    rotationY: 0,
+    collisionWidth: 300,
+    collisionHeight: (cameraHeight - 200)
+  },
+  panels: [
+    {
+      id: 'instructions',
+      width: 1500,
+      height: 1500,
+      x: -1500, 
+      y: -1500,
+      z: 8200,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#303030',
+      opacity: 0.8,
+      innerHTML: `
+        <div style="position: absolute; left: 0px; top: 0px; width: 1500px; height: 150px; background-color: #000000;">
+          <div style="position: absolute; left: 100px; top: 0px; width: 1400px; height: 150px; color: #ffffff; font-size: 100px; line-height: 150px;">
+            HTML3D
+          </div>
+        </div>
+        <div style="position: absolute; left: 100px; top: 200px; width: 1100px; height: 150px; color: #ffffff; font-size: 100px;">
+          move / turn
+        </div>
+        <div style="position: absolute; left: 200px; top: 350px; width: 1300px; height: 420px;">
+          <div style="position: absolute; left: 0px; top: 0px; width: 380px; height: 250px;">
+            <div style="position: absolute; left: 130px; top: 0px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              w
+            </div>
+            <div style="position: absolute; left: 0px; top: 130px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              a
+            </div>
+            <div style="position: absolute; left: 130px; top: 130px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              s
+            </div>
+            <div style="position: absolute; left: 260px; top: 130px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              d
+            </div>
+          </div>
+          <div style="position: absolute; left: 380px; top: 0px; width: 220px; height: 250px; color: #ffffff; font-size: 60px; line-height: 250px; text-align: center;">
+            or
+          </div>
+          <div style="position: absolute; left: 600px; top: 0px; width: 380px; height: 250px;">
+            <div style="position: absolute; left: 130px; top: 0px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              ˄
+            </div>
+            <div style="position: absolute; left: 0px; top: 130px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              ˂
+            </div>
+            <div style="position: absolute; left: 130px; top: 130px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              ˅
+            </div>
+            <div style="position: absolute; left: 260px; top: 130px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              ˃
+            </div>
+          </div>
+          <div style="position: absolute; left: 0px; top: 300px; width: 250px; height: 120px;">
+            <div style="position: absolute; left: 0px; top: 0px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              z
+            </div>
+            <div style="position: absolute; left: 130px; top: 0px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
+              x
+            </div>
+          </div>
+          <div style="position: absolute; left: 300px; top: 300px; width: 800px; height: 120px; color: #ffffff; font-size: 60px; line-height: 120px;">
+          </div>  
+        </div>
+        <div style="position: absolute; left: 100px; top: 850px; width: 1100px; height: 150px; color: #ffffff; font-size: 100px;">
+          interact
+        </div>
+        <div style="position: absolute; left: 200px; top: 1000px; width: 1300px; height: 350px;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 0px; top: 0px; width: 200px; height: 200px;">
+            <path fill="#ffffff" d="M11,1.07C7.05,1.56 4,4.92 4,9H11M4,15A8,8 0 0,0 12,23A8,8 0 0,0 20,15V11H4M13,1.07V9H20C20,4.92 16.94,1.56 13,1.07Z" />
+          </svg>
+          <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 350px; color: #ffffff; font-size: 42px;">
+            All objects are HTML elements, positioned in 3D space with CSS 3D transforms.
+            You can click on them to interact. When an input field has focus, the keys for moving and turning are disabled.
+            To resume being able to move with the keyboard, click outside the input field.
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 'sceneEditor',
+      width: 1650,
+      height: 1500,
+      x: doorWidth, 
+      y: -1500,
+      z: 8200,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#303030',
+      innerHTML: `
+        <div style="position: absolute; left: 0px; top: 0px; width: 1650px; height: 150px; background-color: #000000;">
+          <div style="position: absolute; left: 100px; top: 0px; width: 1550px; height: 150px; color: #ffffff; font-size: 100px; line-height: 150px;">
+            scene editor
+          </div>
+        </div>
+        <div id="scenejsonTextareaContainer" style="position: absolute; left: 100px; top: 250px; width: 1020px; height: 920px; background-color: transparent; overflow: visible;">
+          <textarea id="scenejsonTextarea" style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 5px solid #303030; background-color: #ffffff; color: #000000; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
+          </textarea>
+        </div>
+        <div style="position: absolute; left: 1150px; top: 250px; width: 400px; height: 240px; color: #ffffff; font-size: 24px;">
+          <span style="font-size: 50px;">🛈</span><br />
+          This json code describes the entire scene, including camera position and this scene editor. You can modify the json code and write it to HTML3D.<br />
+        </div>
+        <button id="scenejsonReadButton" title="Read current scene state (including camera position) from HTML3D and update the editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
+            <path d="M13,22L3,12L13,2V8H21V16H13V22M6,12L11,17V14H19V10H11V7L6,12Z"></path>
+          </svg>
+          Read scene from HTML3D
+        </button>
+        <button id="scenejsonWriteButton" title="Send scene in editor to HTML3D and render the new scene.\nWarning: You will teleport to the new camera position." style="position: absolute; left: 1150px; top: 570px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
+            <path d="M11,16H3V8H11V2L21,12L11,22V16M13,7V10H5V14H13V17L18,12L13,7Z"></path>
+          </svg>
+          Write scene to HTML3D
+        </button>
+        <button id="scenejsonCopyToClipboardButton" style="position: absolute; left: 1150px; top: 760px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
+            <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path>
+          </svg>
+          Copy scene to clipboard
+        </button>
+        <button id="scenejsonDownloadFileButton" style="position: absolute; left: 1150px; top: 830px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
+            <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"></path>
+          </svg>
+          Download scene json file
+        </button>
+        <button id="scenejsonLoadFromFileButton" style="position: absolute; left: 1150px; top: 900px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
+            <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z"></path>
+          </svg>
+          Open scene json file
+        </button>
+      `,
+      userData: {
+        hasFocus: false
+      },
+      init(html3d, panel) {
+        const textarea = document.getElementById('scenejsonTextarea');
+        textarea.value = JSON.stringify(html3d.export(), null, 2);
+        const scenejsonReadButton = document.getElementById('scenejsonReadButton');
+        const scenejsonWriteButton = document.getElementById('scenejsonWriteButton');
+        const scenejsonCopyToClipboardButton = document.getElementById('scenejsonCopyToClipboardButton');
+        const scenejsonDownloadFileButton = document.getElementById('scenejsonDownloadFileButton');
+        const scenejsonLoadFromFileButton = document.getElementById('scenejsonLoadFromFileButton');
+        const container = document.getElementById('scenejsonTextareaContainer');
+        container.addEventListener('wheel', (event) => {
+          event.preventDefault();
+          const delta = event.deltaY || event.detail || event.wheelDelta;
+          textarea.scrollTop += delta;
+        }, { passive: false });
+        textarea.addEventListener('input', (event) => {
+          const json = textarea.value;
+          let jsonObject = undefined;
+          try {
+            jsonObject = JSON.parse(json);
+          } catch (error) {
+            jsonObject = undefined;
+          }
+          textarea.style.backgroundColor = (jsonObject !== undefined) ? '#ffffff' : '#ffeeee';
+          scenejsonWriteButton.disabled = (jsonObject === undefined);
+          scenejsonWriteButton.style.backgroundColor = (jsonObject !== undefined) ? '#f0f0f0' : '#cccccc';
+          scenejsonWriteButton.style.cursor = (jsonObject !== undefined) ? 'pointer' : 'not-allowed';
+        });
+        scenejsonReadButton.addEventListener('click', () => {
+          textarea.value = JSON.stringify(html3d.export(), null, 2);
+          textarea.scrollTop = 0;
+        });
+        scenejsonWriteButton.addEventListener('click', () => {
+          let jsonObject = undefined;
+          try {
+            jsonObject = JSON.parse(textarea.value);
+          } catch (error) {
+            jsonObject = undefined;
+          }
+          if (jsonObject !== undefined) {
+            html3d.import(jsonObject);
+          }
+        });
+        scenejsonCopyToClipboardButton.addEventListener('click', () => {
+          navigator.clipboard.writeText(textarea.value).then(() => {
+            scenejsonCopyToClipboardButton.style.backgroundColor = '#ccffcc';
+            setTimeout(() => {
+              scenejsonCopyToClipboardButton.style.backgroundColor = '#f0f0f0';
+            }, 500);
+          }).catch((error) => {
+          });
+        });
+        scenejsonDownloadFileButton.addEventListener('click', () => {
+          const blob = new Blob([textarea.value], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'scene.json';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+        scenejsonLoadFromFileButton.addEventListener('click', () => {
+          const fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.accept = '.json';
+          fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const json = e.target.result;
+                textarea.value = json;
+                let jsonObject = undefined;
+                try {
+                  jsonObject = JSON.parse(json);
+                } catch (error) {
+                  jsonObject = undefined;
+                }
+                textarea.style.backgroundColor = (jsonObject !== undefined) ? '#ffffff' : '#ffeeee';
+                scenejsonWriteButton.disabled = (jsonObject === undefined);
+                scenejsonWriteButton.style.backgroundColor = (jsonObject !== undefined) ? '#f0f0f0' : '#cccccc';
+                scenejsonWriteButton.style.cursor = (jsonObject !== undefined) ? 'pointer' : 'not-allowed';
+              };
+              reader.readAsText(file);
+            }
+          });
+          fileInput.click();
+        });
+      },
+      animate(html3d, panel) {
+        if (document.activeElement.id === 'scenejsonTextarea') {
+          if (!panel.userData.hasFocus) {
+            panel.userData.hasFocus = true;
+            document.activeElement.style.borderColor = '#0088ff';
+          }
+        } else if (panel.userData.hasFocus) {
+          panel.userData.hasFocus = false;
+          document.getElementById('scenejsonTextarea').style.borderColor = '#303030';
+        }
+      }
+    },
+    {
+      id: 'lawnLeft',
+      width: buildingWidth / 2,
+      height: 5500,
+      x: -(buildingWidth / 2), 
+      y: 0,
+      z: (buildingDepth / 2),
+      rotationX: Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#308000'
+    },
+    {
+      id: 'lawnRight',
+      width: (buildingWidth / 2) - doorWidth,
+      height: 5500,
+      x: doorWidth, 
+      y: 0,
+      z: (buildingDepth / 2),
+      rotationX: Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#308000'
+    },
+    {
+      id: 'entrancePath',
+      width: doorWidth,
+      height: 5500,
+      x: 0, 
+      y: 0,
+      z: (buildingDepth / 2),
+      rotationX: Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#999999'
+    },
+    {
+      id: 'pointZero',
+      width: 300,
+      height: 200,
+      x: -100, 
+      y: -10, 
+      z: -100,
+      rotationX: (Math.PI / 2),
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      innerHTML: `
+        <div style="position: absolute; left: 0px; top: 0px; width: 300px; height: 200px;">
+          <svg style="position: absolute; left: 0px; top: 0px; width: 300px; height: 200px;">
+            <line x1="0" y1="100" x2="200" y2="100" style="stroke:#ff0000; stroke-width:10;" />
+            <line x1="100" y1="0" x2="100" y2="200" style="stroke:#0000ff; stroke-width:10;" />
+            <text x="120" y="180" font-size="70" fill="#000000">0,0,0</text>
+          </svg>
+        </div>
+      `
+    },
+    {
+      id: 'axisX',
+      width: 500,
+      height: 200,
+      x: 0, 
+      y: ((-(wallHeight / 2)) + 200) - 100, 
+      z: 0,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      innerHTML: `
+        <div style="position: absolute; left: 0px; top: 0px; width: 500px; height: 200px;">
+          <svg style="position: absolute; left: 0px; top: 0px; width: 500px; height: 200px;">
+            <line x1="0" y1="100" x2="404" y2="100" style="stroke:#ff0000; stroke-width:10;" />
+            <line x1="400" y1="100" x2="360" y2="60" style="stroke:#ff0000; stroke-width:10;" />
+            <line x1="400" y1="100" x2="360" y2="140" style="stroke:#ff0000; stroke-width:10;" />
+            <text x="420" y="135" font-size="100" fill="#ff0000">X</text>
+          </svg>
+        </div>
+      `
+    },
+    {
+      id: 'axisY',
+      width: 200,
+      height: 500,
+      x: -100, 
+      y: ((-(wallHeight / 2)) + 200),
+      z: 0,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      innerHTML: `
+        <div style="position: absolute; left: 0px; top: 0px; width: 200px; height: 500px;">
+          <svg style="position: absolute; left: 0px; top: 0px; width: 200px; height: 500px;">
+            <line x1="100" y1="0" x2="100" y2="324" style="stroke:#00ff00; stroke-width:10;" />
+            <line x1="100" y1="320" x2="60" y2="280" style="stroke:#00ff00; stroke-width:10;" />
+            <line x1="100" y1="320" x2="140" y2="280" style="stroke:#00ff00; stroke-width:10;" />
+            <text x="67" y="420" font-size="100" fill="#00ff00">Y</text>
+          </svg>
+        </div>
+      `
+    },
+    {
+      id: 'axisZ',
+      width: 500,
+      height: 200,
+      x: 0, 
+      y: ((-(wallHeight / 2)) + 200) - 100, 
+      z: 500,
+      rotationX: 0,
+      rotationY: (Math.PI / 2),
+      obstruction: false,
+      interaction: true,
+      innerHTML: `
+        <div style="position: absolute; left: 0px; top: 0px; width: 500px; height: 200px;">
+          <svg style="position: absolute; left: 0px; top: 0px; width: 500px; height: 200px;">
+            <line x1="96" y1="100" x2="500" y2="100" style="stroke:#0000ff; stroke-width:10;" />
+            <line x1="100" y1="100" x2="136" y2="60" style="stroke:#0000ff; stroke-width:10;" />
+            <line x1="100" y1="100" x2="136" y2="140" style="stroke:#0000ff; stroke-width:10;" />
+            <text x="0" y="135" font-size="100" fill="#0000ff">Z</text>
+          </svg>
+        </div>
+      `
+    },
+    {
+      id: 'floor',
+      width: buildingWidth,
+      height: buildingDepth,
+      x: -(buildingWidth / 2), 
+      y: 0,
+      z: -(buildingDepth / 2),
+      rotationX: Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#999999'
+    },
+    {
+      id: 'wallBack',
+      width: buildingWidth,
+      height: wallHeight,
+      x: -(buildingWidth / 2), 
+      y: -wallHeight, 
+      z: -(buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#e0e0e0'
+    },
+    {
+      id: 'wallLeft',
+      width: buildingDepth,
+      height: wallHeight,
+      x: -(buildingWidth / 2), 
+      y: -wallHeight, 
+      z: -(buildingDepth / 2),
+      rotationX: 0,
+      rotationY: -Math.PI / 2,
+      obstruction: true,
+      backgroundColor: '#d3d3d3'
+    },
+    {
+      id: 'wallRight',
+      width: buildingDepth,
+      height: wallHeight,
+      x: (buildingWidth / 2), 
+      y: -wallHeight, 
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: Math.PI / 2,
+      obstruction: true,
+      backgroundColor: '#d3d3d3'
+    },
+    {
+      id: 'wallFrontLeft',
+      width: (buildingWidth / 2),
+      height: wallHeight,
+      x: -(buildingWidth / 2), 
+      y: -wallHeight, 
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#cccccc'
+    },
+    {
+      id: 'wallFrontRight',
+      width: ((buildingWidth / 2) - doorWidth),
+      height: wallHeight,
+      x: doorWidth,
+      y: -wallHeight,
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#cccccc'
+    },
+    {
+      id: 'wallEntranceLeft',
+      width: 800,
+      height: wallHeight,
+      x: 0, 
+      y: -wallHeight, 
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: (Math.PI / 2),
+      obstruction: true,
+      backgroundColor: '#a0a0a0'
+    },
+    {
+      id: 'wallEntranceRight',
+      width: 800,
+      height: wallHeight,
+      x: doorWidth, 
+      y: -wallHeight, 
+      z: (buildingDepth / 2) - 800,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: true,
+      backgroundColor: '#a0a0a0'
+    },
+    {
+      id: 'wallInsideLeft',
+      width: (buildingWidth / 2),
+      height: wallHeight,
+      x: 0, 
+      y: -wallHeight, 
+      z: (buildingDepth / 2) - 800,
+      rotationX: 0,
+      rotationY: -Math.PI,
+      obstruction: true,
+      backgroundColor: '#e0e0e0'
+    },
+    {
+      id: 'wallInsideRight',
+      width: ((buildingWidth / 2) - doorWidth),
+      height: wallHeight,
+      x: (buildingWidth / 2), 
+      y: -wallHeight, 
+      z: (buildingDepth / 2) - 800,
+      rotationX: 0,
+      rotationY: -Math.PI,
+      obstruction: true,
+      backgroundColor: '#e0e0e0'
+    },    
+    {
+      id: 'door',
+      title: 'open/close door',
+      width: doorWidth,
+      height: wallHeight,
+      x: 0, 
+      y: -wallHeight, 
+      z: (buildingDepth / 2) - 600,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#0099ff',
+      opacity: 0.3,
+      innerHTML: `
+        <svg style="position: absolute; left: 20px; top: ${((wallHeight/2) + 200)}px; width: 160px; height: 160px;">
+          <circle cx="80" cy="80" r="70" stroke="#ffffff" stroke-width="20" fill="none" />
+          <line x1="80" y1="40" x2="80" y2="120" style="stroke:#ffffff; stroke-width:20;" />
+        </svg>
+      `,
+      userData: {
+        opening: false,
+        closing: false,
+        opened: false,
+        waitAnimate: false
+      },
+      click(html3d, panel) {
+        if ((panel.userData.opening !== true) && (panel.userData.closing !== true)) {
+          if (panel.userData.opened !== true) {
+            panel.userData.opening = true;
+          } else {
+            panel.userData.closing = true;
+          }
+          panel.userData.waitAnimate = true;
+          AUDIO.resumeContext().then(() => {
+            {
+              const gainNode1 = AUDIO.audioCtx.createGain();
+              gainNode1.connect(AUDIO.audioCtxMainGain);
+              gainNode1.gain.setValueAtTime(0.30, AUDIO.audioCtx.currentTime);
+              const oscillator1 = AUDIO.audioCtx.createOscillator();
+              oscillator1.type = 'triangle';
+              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime);
+              oscillator1.start(AUDIO.audioCtx.currentTime);
+              oscillator1.stop(AUDIO.audioCtx.currentTime + 0.6);
+              oscillator1.connect(gainNode1);
+            }
+            {
+              const gainNode2 = AUDIO.audioCtx.createGain();
+              gainNode2.connect(AUDIO.audioCtxMainGain);
+              gainNode2.gain.setValueAtTime(0.10, AUDIO.audioCtx.currentTime);
+              const oscillator2 = AUDIO.audioCtx.createOscillator();
+              oscillator2.type = 'square';
+              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime);
+              oscillator2.connect(gainNode2);
+              oscillator2.start(AUDIO.audioCtx.currentTime);
+              oscillator2.stop(AUDIO.audioCtx.currentTime + 0.6);
+            }
+            {
+              const gainNode3 = AUDIO.audioCtx.createGain();
+              gainNode3.connect(AUDIO.audioCtxMainGain);
+              gainNode3.gain.setValueAtTime(0.02, AUDIO.audioCtx.currentTime);
+              const oscillator3 = AUDIO.audioCtx.createOscillator();
+              oscillator3.type = 'sine';
+              oscillator3.frequency.setValueAtTime(3000, AUDIO.audioCtx.currentTime);
+              oscillator3.connect(gainNode3);
+              oscillator3.start(AUDIO.audioCtx.currentTime);
+              oscillator3.stop(AUDIO.audioCtx.currentTime + 0.6);
+            }
+            panel.userData.waitAnimate = false;
+          });
+        }
+      },
+      animate(html3d, panel) {
+        if (panel.userData.waitAnimate === true) {
+          return;
+        }
+        if (panel.userData.opening === true) {
+          const doorSpeed = 40;
+          panel.x += doorSpeed;
+          if (panel.x > (doorWidth - 200)) {
+            panel.x = doorWidth - 200;
+            panel.userData.opening = false;
+            panel.userData.opened = true;
+          }
+          panel.updateWorldMatrix();
+          html3d.requestRender = true;
+        } else if (panel.userData.closing === true) {
+          const doorSpeed = 40;
+          panel.x -= doorSpeed;
+          if (panel.x < 0) {
+            panel.x = 0
+            panel.userData.closing = false;
+            panel.userData.opened = false;
+          }
+          panel.updateWorldMatrix();
+          html3d.requestRender = true;
+        }
+      }
+    },
+    {
+      id: 'ceilingFront',
+      width: buildingWidth,
+      height: (buildingDepth - 3000),
+      x: -(buildingWidth / 2),
+      y: -wallHeight,
+      z: (buildingDepth / 2),
+      rotationX: -Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#6C6C6C'
+    },
+    {
+      id: 'ceilingBack',
+      width: (buildingWidth - 3000),
+      height: 3000,
+      x: (-buildingWidth / 2) + 3000,
+      y: -wallHeight,
+      z: (-buildingDepth / 2) + 3000,
+      rotationX: -Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#6C6C6C'
+    },
+    {
+      id: 'firstFloorFront',
+      width: buildingWidth,
+      height: (buildingDepth - 3000),
+      x: -(buildingWidth / 2),
+      y: -(wallHeight + floorDepth),
+      z: (buildingDepth / 2),
+      rotationX: -Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#fefefe'
+    },
+    {
+      id: 'firstFloorBack',
+      width: (buildingWidth - 3000),
+      height: 3000,
+      x: (-buildingWidth / 2) + 3000,
+      y: -(wallHeight + floorDepth),
+      z: (-buildingDepth / 2) + 3000,
+      rotationX: -Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#fefefe'
+    },
+    {
+      id: 'firstFloorPanelFront',
+      width: 3000,
+      height: floorDepth,
+      x: -(buildingWidth / 2),
+      y: -(wallHeight + floorDepth),
+      z: (-buildingDepth / 2) + 3000,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#e0e0e0'
+    },
+    {
+      id: 'firstFloorPanelRight',
+      width: 3000,
+      height: floorDepth,
+      x: (-buildingWidth / 2) + 3000,
+      y: -(wallHeight + floorDepth),
+      z: (-buildingDepth / 2),
+      rotationX: 0,
+      rotationY: -Math.PI / 2,
+      obstruction: false,
+      backgroundColor: '#d3d3d3'
+    },
+    {
+      id: 'wallBackTop',
+      width: buildingWidth,
+      height: (wallHeight + floorDepth),
+      x: -(buildingWidth / 2),
+      y: -(wallHeight + floorDepth + wallHeight), 
+      z: -(buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#e0e0e0'
+    },
+    {
+      id: 'wallLeftTop',
+      width: buildingDepth,
+      height: (wallHeight + floorDepth),
+      x: -(buildingWidth / 2), 
+      y: -(wallHeight + floorDepth + wallHeight), 
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: Math.PI / 2,
+      obstruction: true,
+      backgroundColor: '#d3d3d3'
+    },
+    {
+      id: 'wallRightTop',
+      width: buildingDepth,
+      height: (wallHeight + floorDepth),
+      x: (buildingWidth / 2), 
+      y: -(wallHeight + floorDepth + wallHeight), 
+      z: -(buildingDepth / 2),
+      rotationX: 0,
+      rotationY: -Math.PI / 2,
+      obstruction: true,
+      backgroundColor: '#d3d3d3'
+    },
+    {
+      id: 'wallFrontTopLeft',
+      width: ((buildingWidth / 2) - firstFloorWindowWidth) / 2,
+      height: (wallHeight + floorDepth),
+      x: -(buildingWidth / 2),
+      y: -(wallHeight + floorDepth + wallHeight),
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#cccccc'
+    },
+    {
+      id: 'wallFrontTopLeftTop',
+      width: firstFloorWindowWidth,
+      height: (wallHeight - firstFloorWindowHeight) / 2,
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: -(wallHeight + floorDepth + wallHeight),
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#cccccc'
+    },
+    {
+      id: 'wallFrontTopLeftBottom',
+      width: firstFloorWindowWidth,
+      height: ((wallHeight - firstFloorWindowHeight) / 2) + firstFloorWindowHeight,
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: -(wallHeight + floorDepth + ((wallHeight - firstFloorWindowHeight) / 2)),
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#cccccc'
+    },
+    {
+      id: 'wallFrontTopRight',
+      width: ((buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2)),
+      height: (wallHeight + floorDepth),
+      x: -(((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: -(wallHeight + floorDepth + wallHeight),
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#cccccc'
+    },
+    {
+      id: 'wallFrontTopLeftInside',
+      width: (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      height: wallHeight,
+      x: -(buildingWidth / 2),
+      y: -(wallHeight + floorDepth + wallHeight),
+      z: (buildingDepth / 2) - firstFloorWallDepth,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#eeeeee'
+    },
+    {
+      id: 'wallFrontTopLeftTopInside',
+      width: firstFloorWindowWidth,
+      height: (wallHeight - firstFloorWindowHeight) / 2,
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: -(wallHeight + floorDepth + wallHeight),
+      z: (buildingDepth / 2) - firstFloorWallDepth,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#eeeeee'
+    },
+    {
+      id: 'wallFrontTopLeftBottomInside',
+      width: firstFloorWindowWidth,
+      height: ((wallHeight - firstFloorWindowHeight) / 2),
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: -(wallHeight + floorDepth + ((wallHeight - firstFloorWindowHeight) / 2)),
+      z: (buildingDepth / 2) - firstFloorWallDepth,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#eeeeee'
+    },
+    {
+      id: 'wallFrontTopRightInside',
+      width: ((buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2)),
+      height: wallHeight,
+      x: -(((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: -(wallHeight + floorDepth + wallHeight),
+      z: (buildingDepth / 2) - firstFloorWallDepth,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#eeeeee'
+    },
+    {
+      id: 'windowInnerWallLeft',
+      width: firstFloorWallDepth,
+      height: firstFloorWindowHeight,
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: (-(wallHeight + floorDepth + wallHeight)) + ((wallHeight - firstFloorWindowHeight) / 2),
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: Math.PI / 2,
+      obstruction: false,
+      backgroundColor: '#a0a0a0'
+    },
+    {
+      id: 'windowInnerWallRight',
+      width: firstFloorWallDepth,
+      height: firstFloorWindowHeight,
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2) + firstFloorWindowWidth,
+      y: (-(wallHeight + floorDepth + wallHeight)) + ((wallHeight - firstFloorWindowHeight) / 2),
+      z: (buildingDepth / 2),
+      rotationX: 0,
+      rotationY: Math.PI / 2,
+      obstruction: false,
+      backgroundColor: '#a0a0a0'
+    },
+    {
+      id: 'windowInnerWallTop',
+      width: firstFloorWindowWidth,
+      height: firstFloorWallDepth,
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: (-(wallHeight + floorDepth + wallHeight)) + ((wallHeight - firstFloorWindowHeight) / 2),
+      z: (buildingDepth / 2),
+      rotationX: -Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#bbbbbb'
+    },
+    {
+      id: 'windowInnerWallBottom',
+      width: firstFloorWindowWidth,
+      height: firstFloorWallDepth,
+      x: (-buildingWidth / 2) + (((buildingWidth / 2) - firstFloorWindowWidth) / 2),
+      y: (-(wallHeight + floorDepth)) - ((wallHeight - firstFloorWindowHeight) / 2),
+      z: (buildingDepth / 2),
+      rotationX: -Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#bbbbbb'
+    },
+    {
+      id: 'roof',
+      width: buildingWidth,
+      height: buildingDepth,
+      x: -(buildingWidth / 2),
+      y: -(wallHeight + floorDepth + wallHeight),
+      z: -(buildingDepth / 2),
+      rotationX: Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      backgroundColor: '#aaaaaa'
+    },
+    {
+      id: 'elevator',
+      width: 3000,
+      height: 3000,
+      x: (-buildingWidth / 2),
+      y: -10,
+      z: (-buildingDepth / 2),
+      rotationX: Math.PI / 2,
+      rotationY: 0,
+      obstruction: true,
+      backgroundColor: '#0099ff',
+      opacity: 0.3,
+      userData: {
+        goingUp: false,
+        goingDown: false,
+        isUp: false,
+        animateCameraOnElevator: false,
+        waitAnimate: false
+      },
+      animate(html3d, panel) {
+        const elevatorObject = panel;
+        if (elevatorObject.userData.waitAnimate === true) {
+          return;
+        }
+        if (elevatorObject.userData.goingUp === true) {
+          const elevatorSpeed = 20;
+          elevatorObject.y -= elevatorSpeed;
+          if (elevatorObject.y < (-(wallHeight + floorDepth))) {
+            elevatorObject.y = -(wallHeight + floorDepth);
+            elevatorObject.userData.goingUp = false;
+            elevatorObject.userData.isUp = true;
+          }
+          elevatorObject.updateWorldMatrix();
+          if (elevatorObject.userData.animateCameraOnElevator === true) {
+            html3d.camera.y = elevatorObject.y - cameraHeight;
+            html3d.camera.updateWorldMatrix();
+          }
+          html3d.requestRender = true;
+        } else if (elevatorObject.userData.goingDown === true) {
+          const elevatorSpeed = 20;
+          elevatorObject.y += elevatorSpeed;
+          if (elevatorObject.y > -10) {
+            elevatorObject.y = -10;
+            elevatorObject.userData.goingDown = false;
+            elevatorObject.userData.isUp = false;
+          }
+          elevatorObject.updateWorldMatrix();
+          if (elevatorObject.userData.animateCameraOnElevator === true) {
+            html3d.camera.y = elevatorObject.y - cameraHeight;
+            html3d.camera.updateWorldMatrix();
+          }
+          html3d.requestRender = true;
+        } else {
+          if ((html3d.camera.x > (-buildingWidth / 2)) && (html3d.camera.x < (-buildingWidth / 2) + 3000) &&
+              (html3d.camera.z > (-buildingDepth / 2)) && (html3d.camera.z < (-buildingDepth / 2) + 3000)) {
+            if (elevatorObject.userData.isUp !== true) {
+              if (html3d.camera.y < -cameraHeight) {
+                html3d.camera.y += 50;
+                if (html3d.camera.y > -cameraHeight) {
+                  html3d.camera.y = -cameraHeight;
+                }
+                html3d.camera.updateWorldMatrix();
+                html3d.requestRender = true;
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      id: 'groundFloorElevatorControls',
+      title: 'move elevator up or down',
+      width: 300,
+      height: 300,
+      x: (-buildingWidth / 2) + 2000,
+      y: (-wallHeight / 2),
+      z: (-buildingDepth / 2) + 3000,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#0099ff',
+      innerHTML: `
+        <svg style="position: absolute; left: 50px; top: 50px; width: 200px; height: 200px;">
+          <circle cx="100" cy="100" r="80" stroke="#ffffff" stroke-width="10" fill="none" />
+          <line x1="100" y1="40" x2="100" y2="160" style="stroke:#ffffff; stroke-width:10;" />
+        </svg>
+      `,
+      click(html3d, panel) {
+        const elevatorObject = html3d.panels.find((so) => so.id === 'elevator');
+        if ((html3d.camera.x > (-buildingWidth / 2)) && (html3d.camera.x < (-buildingWidth / 2) + 3000) &&
+            (html3d.camera.z > (-buildingDepth / 2)) && (html3d.camera.z < (-buildingDepth / 2) + 3000)) {
+          elevatorObject.userData.animateCameraOnElevator = true;
+        } else {
+          elevatorObject.userData.animateCameraOnElevator = false;
+        }
+        if ((elevatorObject.userData.goingUp !== true) && (elevatorObject.userData.goingDown !== true)) {
+          if (elevatorObject.userData.isUp !== true) {
+            elevatorObject.userData.goingUp = true;
+          } else {
+            elevatorObject.userData.goingDown = true;
+          }
+          elevatorObject.userData.waitAnimate = true;
+          AUDIO.resumeContext().then(() => {
+            {
+              const gainNode1 = AUDIO.audioCtx.createGain();
+              gainNode1.connect(AUDIO.audioCtxMainGain);
+              gainNode1.gain.setValueAtTime(0.30, AUDIO.audioCtx.currentTime);
+              const oscillator1 = AUDIO.audioCtx.createOscillator();
+              oscillator1.type = 'triangle';
+              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime);
+              oscillator1.start(AUDIO.audioCtx.currentTime);
+              oscillator1.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator1.connect(gainNode1);
+            }
+            {
+              const gainNode2 = AUDIO.audioCtx.createGain();
+              gainNode2.connect(AUDIO.audioCtxMainGain);
+              gainNode2.gain.setValueAtTime(0.10, AUDIO.audioCtx.currentTime);
+              const oscillator2 = AUDIO.audioCtx.createOscillator();
+              oscillator2.type = 'sawtooth';
+              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime);
+              oscillator2.connect(gainNode2);
+              oscillator2.start(AUDIO.audioCtx.currentTime);
+              oscillator2.stop(AUDIO.audioCtx.currentTime + 1.7);
+            }
+            {
+              const gainNode3 = AUDIO.audioCtx.createGain();
+              gainNode3.connect(AUDIO.audioCtxMainGain);
+              gainNode3.gain.setValueAtTime(0.02, AUDIO.audioCtx.currentTime);
+              const oscillator3 = AUDIO.audioCtx.createOscillator();
+              oscillator3.type = 'sine';
+              oscillator3.frequency.setValueAtTime(1000, AUDIO.audioCtx.currentTime);
+              oscillator3.connect(gainNode3);
+              oscillator3.start(AUDIO.audioCtx.currentTime);
+              oscillator3.stop(AUDIO.audioCtx.currentTime + 1.7);
+            }
+            elevatorObject.userData.waitAnimate = false;
+          });
+        }
+      }
+    },
+    {
+      id: 'groundFloorElevatorControlsStand',
+      width: 300,
+      height: ((wallHeight / 2) - 300),
+      x: (-buildingWidth / 2) + 2000,
+      y: -((wallHeight / 2) - 300),
+      z: (-buildingDepth / 2) + 3000,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: false,
+      backgroundColor: '#444444'
+    },
+    {
+      id: 'firstFloorElevatorControls',
+      title: 'move elevator up or down',
+      width: 300,
+      height: 300,
+      x: (-buildingWidth / 2) + 2000,
+      y: (-(wallHeight + floorDepth)) + (-wallHeight / 2),
+      z: (-buildingDepth / 2) + 3000,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#0099ff',
+      innerHTML: `
+        <svg style="position: absolute; left: 50px; top: 50px; width: 200px; height: 200px;">
+          <circle cx="100" cy="100" r="80" stroke="#ffffff" stroke-width="10" fill="none" />
+          <line x1="100" y1="40" x2="100" y2="160" style="stroke:#ffffff; stroke-width:10;" />
+        </svg>
+      `,
+      click(html3d, panel) {
+        const elevatorObject = html3d.panels.find((so) => so.id === 'elevator');
+        if ((html3d.camera.x > (-buildingWidth / 2)) && (html3d.camera.x < (-buildingWidth / 2) + 3000) &&
+            (html3d.camera.z > (-buildingDepth / 2)) && (html3d.camera.z < (-buildingDepth / 2) + 3000)) {
+          elevatorObject.userData.animateCameraOnElevator = true;
+        } else {
+          elevatorObject.userData.animateCameraOnElevator = false;
+        }
+        if ((elevatorObject.userData.goingUp !== true) && (elevatorObject.userData.goingDown !== true)) {
+          if (elevatorObject.userData.isUp !== true) {
+            elevatorObject.userData.goingUp = true;
+          } else {
+            elevatorObject.userData.goingDown = true;
+          }
+          elevatorObject.userData.waitAnimate = true;
+          AUDIO.resumeContext().then(() => {
+            {
+              const gainNode1 = AUDIO.audioCtx.createGain();
+              gainNode1.connect(AUDIO.audioCtxMainGain);
+              gainNode1.gain.setValueAtTime(0.30, AUDIO.audioCtx.currentTime);
+              const oscillator1 = AUDIO.audioCtx.createOscillator();
+              oscillator1.type = 'triangle';
+              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime);
+              oscillator1.start(AUDIO.audioCtx.currentTime);
+              oscillator1.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator1.connect(gainNode1);
+            }
+            {
+              const gainNode2 = AUDIO.audioCtx.createGain();
+              gainNode2.connect(AUDIO.audioCtxMainGain);
+              gainNode2.gain.setValueAtTime(0.10, AUDIO.audioCtx.currentTime);
+              const oscillator2 = AUDIO.audioCtx.createOscillator();
+              oscillator2.type = 'sawtooth';
+              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime);
+              oscillator2.connect(gainNode2);
+              oscillator2.start(AUDIO.audioCtx.currentTime);
+              oscillator2.stop(AUDIO.audioCtx.currentTime + 1.7);
+            }
+            {
+              const gainNode3 = AUDIO.audioCtx.createGain();
+              gainNode3.connect(AUDIO.audioCtxMainGain);
+              gainNode3.gain.setValueAtTime(0.02, AUDIO.audioCtx.currentTime);
+              const oscillator3 = AUDIO.audioCtx.createOscillator();
+              oscillator3.type = 'sine';
+              oscillator3.frequency.setValueAtTime(1000, AUDIO.audioCtx.currentTime);
+              oscillator3.connect(gainNode3);
+              oscillator3.start(AUDIO.audioCtx.currentTime);
+              oscillator3.stop(AUDIO.audioCtx.currentTime + 1.7);
+            }
+            elevatorObject.userData.waitAnimate = false;
+          });
+        }
+      }
+    },
+    {
+      id: 'firstFloorElevatorControlsStand',
+      width: 300,
+      height: ((wallHeight / 2) - 300),
+      x: (-buildingWidth / 2) + 2000,
+      y: ((-(wallHeight + floorDepth)) - ((wallHeight / 2) - 300)),
+      z: (-buildingDepth / 2) + 3000,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: false,
+      backgroundColor: '#444444'
+    },
+    {
+      id: 'testPanelControllerStand',
+      width: 640,
+      height: ((wallHeight / 2) - 100),
+      x: 600,
+      y: -((wallHeight / 2) - 100),
+      z: 10,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#444444'
+    },
+    {
+      id: 'testPanelControllerPanel',
+      width: 640,
+      height: 370,
+      x: 600,
+      y: -((wallHeight / 2) - 100),
+      z: 10,
+      rotationX: ((Math.PI / 2) * 0.3),
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#222222',
+      innerHTML: `
+        <div id="testPanelControllerPanel_header" style="position: absolute; left: 170px; top: 10px; width: 400px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 18px;">
+          TEST PANEL CONTROLLER
+        </div>
+        <div style="position: absolute; left: 0px; top: 55px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          width
+        </div>
+          <input id="testPanelControllerPanel_width" type="range" min="10" max="1000" step="10" style="position: absolute; left: 170px; top: 55px; width: 250px; height: 18px; overflow: hidden; appearance: none; accent-color: #ff0000; background-color: #ffffff;">
+          <div id="testPanelControllerPanel_width_value" style="position: absolute; left: 450px; top: 55px; width: 150px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px;">
+            width value
+          </div>
+        <div style="position: absolute; left: 0px; top: 90px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          height
+        </div>
+          <input id="testPanelControllerPanel_height" type="range" min="10" max="1000" step="10" style="position: absolute; left: 170px; top: 90px; width: 250px; height: 18px; overflow: hidden; appearance: none; accent-color: #00ff00; background-color: #ffffff;">
+          <div id="testPanelControllerPanel_height_value" style="position: absolute; left: 450px; top: 90px; width: 150px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px;">
+            height value
+          </div>
+        <div style="position: absolute; left: 0px; top: 125px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          x
+        </div>
+          <input id="testPanelControllerPanel_x" type="range" min="-3000" max="3000" step="10" style="position: absolute; left: 170px; top: 125px; width: 250px; height: 18px; overflow: hidden; appearance: none; accent-color: #ff0000; background-color: #ffffff;">
+          <div id="testPanelControllerPanel_x_value" style="position: absolute; left: 450px; top: 125px; width: 150px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px;">
+            x value
+          </div>
+          <button id="testPanelControllerPanel_x_value_reset" title="set to 0" style="position: absolute; left: 550px; top: 125px; width: 50px; height: 22px; color: #000000; font-size: 12px; cursor: pointer;">
+            reset
+          </button>
+        <div style="position: absolute; left: 0px; top: 160px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          y
+        </div>
+          <input id="testPanelControllerPanel_y" type="range" min="-3000" max="3000" step="10" style="position: absolute; left: 170px; top: 160px; width: 250px; height: 18px; overflow: hidden; appearance: none; accent-color: #00ff00; background-color: #ffffff;">
+          <div id="testPanelControllerPanel_y_value" style="position: absolute; left: 450px; top: 160px; width: 150px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px;">
+            y value
+          </div>
+          <button id="testPanelControllerPanel_y_value_reset" title="set to 0" style="position: absolute; left: 550px; top: 160px; width: 50px; height: 22px; color: #000000; font-size: 12px; cursor: pointer;">
+            reset
+          </button>
+        <div style="position: absolute; left: 0px; top: 195px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          z
+        </div>
+          <input id="testPanelControllerPanel_z" type="range" min="-3000" max="3000" step="10" style="position: absolute; left: 170px; top: 195px; width: 250px; height: 18px; overflow: hidden; appearance: none; accent-color: #0000ff; background-color: #ffffff;">
+          <div id="testPanelControllerPanel_z_value" style="position: absolute; left: 450px; top: 195px; width: 150px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px;">
+            z value
+          </div>
+          <button id="testPanelControllerPanel_z_value_reset" title="set to 0" style="position: absolute; left: 550px; top: 195px; width: 50px; height: 22px; color: #000000; font-size: 12px; cursor: pointer;">
+            reset
+          </button>
+        <div style="position: absolute; left: 0px; top: 230px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          rotation x
+        </div>
+          <input id="testPanelControllerPanel_rotationXdegrees" type="range" min="-180" max="180" step="1" style="position: absolute; left: 170px; top: 230px; width: 250px; height: 18px; overflow: hidden; appearance: none; accent-color: #ff0000; background-color: #ffffff;">
+          <div id="testPanelControllerPanel_rotationXdegrees_valueRadians" style="position: absolute; left: 450px; top: 230px; width: 150px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px;">
+            rotation x value
+          </div>
+          <button id="testPanelControllerPanel_rotationXdegrees_valueRadians_reset" title="set to 0" style="position: absolute; left: 550px; top: 230px; width: 50px; height: 22px; color: #000000; font-size: 12px; cursor: pointer;">
+            reset
+          </button>
+        <div style="position: absolute; left: 0px; top: 265px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          rotation y
+        </div>
+          <input id="testPanelControllerPanel_rotationYdegrees" type="range" min="-180" max="180" step="1" style="position: absolute; left: 170px; top: 265px; width: 250px; height: 18px; overflow: hidden; appearance: none; accent-color: #00ff00; background-color: #ffffff;">
+          <div id="testPanelControllerPanel_rotationYdegrees_valueRadians" style="position: absolute; left: 450px; top: 265px; width: 150px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px;">
+            rotation y value
+          </div>
+          <button id="testPanelControllerPanel_rotationYdegrees_valueRadians_reset" title="set to 0" style="position: absolute; left: 550px; top: 265px; width: 50px; height: 22px; color: #000000; font-size: 12px; cursor: pointer;">
+            reset
+          </button>
+        <div style="position: absolute; left: 0px; top: 300px; width: 130px; height: 22px; line-height: 22px; color: #ffffff; overflow: hidden; white-space: nowrap; font-size: 16px; text-align: right;">
+          anchor center
+        </div>
+          <div id="testPanelControllerPanel_anchorCenter" style="position: absolute; left: 170px; top: 300px; width: 22px; height: 22px; background-color: #ffffff; cursor: pointer;">
+            <svg id="testPanelControllerPanel_anchorCenter_check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 0px; top: 0px; width: 22px; height: 22px;">
+              <path fill="#000000" d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" />
+            </svg>
+          </div>
+      `,
+      userData: {
+        idHasFocus: null
+      },
+      init(html3d, panel) {
+        const testPanel = html3d.panels.find((so) => so.id === 'testPanel');
+        const testPanelContainer = document.getElementById('testPanelContainer');
+        const testPanelContent = document.getElementById('testPanelContent');
+        const widthInput = document.getElementById('testPanelControllerPanel_width');
+        const widthValue = document.getElementById('testPanelControllerPanel_width_value');
+        const heightInput = document.getElementById('testPanelControllerPanel_height');
+        const heightValue = document.getElementById('testPanelControllerPanel_height_value');
+        const xInput = document.getElementById('testPanelControllerPanel_x');
+        const xValue = document.getElementById('testPanelControllerPanel_x_value');
+        const xValueReset = document.getElementById('testPanelControllerPanel_x_value_reset');
+        const yInput = document.getElementById('testPanelControllerPanel_y');
+        const yValue = document.getElementById('testPanelControllerPanel_y_value');
+        const yValueReset = document.getElementById('testPanelControllerPanel_y_value_reset');
+        const zInput = document.getElementById('testPanelControllerPanel_z');
+        const zValue = document.getElementById('testPanelControllerPanel_z_value');
+        const zValueReset = document.getElementById('testPanelControllerPanel_z_value_reset');
+        const rotationXInput = document.getElementById('testPanelControllerPanel_rotationXdegrees');
+        const rotationXValue = document.getElementById('testPanelControllerPanel_rotationXdegrees_valueRadians');
+        const rotationXValueReset = document.getElementById('testPanelControllerPanel_rotationXdegrees_valueRadians_reset');
+        const rotationYInput = document.getElementById('testPanelControllerPanel_rotationYdegrees');
+        const rotationYValue = document.getElementById('testPanelControllerPanel_rotationYdegrees_valueRadians');
+        const rotationYValueReset = document.getElementById('testPanelControllerPanel_rotationYdegrees_valueRadians_reset');
+        const anchorCenter = document.getElementById('testPanelControllerPanel_anchorCenter');
+        const anchorCenterCheck = document.getElementById('testPanelControllerPanel_anchorCenter_check');
+        widthInput.addEventListener('input', () => {
+          testPanel.width = parseInt(widthInput.value, 10);
+          testPanel.element.style.width = `${testPanel.width}px`;
+          testPanelContainer.style.width = `${testPanel.width - 20}px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          widthValue.textContent = `${testPanel.width} px`;
+        });
+        heightInput.addEventListener('input', () => {
+          testPanel.height = parseInt(heightInput.value, 10);
+          testPanel.element.style.height = `${testPanel.height}px`;
+          testPanelContainer.style.height = `${testPanel.height - 20}px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          heightValue.textContent = `${testPanel.height} px`;
+        });
+        xInput.addEventListener('input', () => {
+          testPanel.x = parseInt(xInput.value, 10);
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          xValue.textContent = `${testPanel.x} px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          xValueReset.style.visibility = (testPanel.x === 0) ? 'hidden' : 'visible';
+        });
+        xValueReset.addEventListener('click', () => {
+          testPanel.x = 0;
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          xInput.value = testPanel.x;
+          xValue.textContent = `${testPanel.x} px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          xValueReset.style.visibility = 'hidden';
+        });
+        yInput.addEventListener('input', () => {
+          testPanel.y = parseInt(yInput.value, 10);
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          yValue.textContent = `${testPanel.y} px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          yValueReset.style.visibility = (testPanel.y === 0) ? 'hidden' : 'visible';
+        });
+        yValueReset.addEventListener('click', () => {
+          testPanel.y = 0;
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          yInput.value = testPanel.y;
+          yValue.textContent = `${testPanel.y} px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          yValueReset.style.visibility = 'hidden';
+        });
+        zInput.addEventListener('input', () => {
+          testPanel.z = parseInt(zInput.value, 10);
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          zValue.textContent = `${testPanel.z} px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          zValueReset.style.visibility = (testPanel.z === 0) ? 'hidden' : 'visible';
+        });
+        zValueReset.addEventListener('click', () => {
+          testPanel.z = 0;
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          zInput.value = testPanel.z;
+          zValue.textContent = `${testPanel.z} px`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          zValueReset.style.visibility = 'hidden';
+        });
+        rotationXInput.addEventListener('input', () => {
+          const rotationX = parseFloat(rotationXInput.value);
+          testPanel.rotationX = rotationX * (Math.PI / 180);
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          rotationXValue.textContent = `${testPanel.rotationX.toFixed(3)} rad`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          rotationXValueReset.style.visibility = (testPanel.rotationX === 0) ? 'hidden' : 'visible';
+        });
+        rotationXValueReset.addEventListener('click', () => {
+          testPanel.rotationX = 0;
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          rotationXInput.value = (testPanel.rotationX * (180 / Math.PI)).toFixed(3);
+          rotationXValue.textContent = `${testPanel.rotationX.toFixed(3)} rad`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          rotationXValueReset.style.visibility = 'hidden';
+        });
+        rotationYInput.addEventListener('input', () => {
+          const rotationY = parseFloat(rotationYInput.value);
+          testPanel.rotationY = rotationY * (Math.PI / 180);
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          rotationYValue.textContent = `${testPanel.rotationY.toFixed(3)} rad`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          rotationYValueReset.style.visibility = (testPanel.rotationY === 0) ? 'hidden' : 'visible';
+        });
+        rotationYValueReset.addEventListener('click', () => {
+          testPanel.rotationY = 0;
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          rotationYInput.value = (testPanel.rotationY * (180 / Math.PI)).toFixed(3);
+          rotationYValue.textContent = `${testPanel.rotationY.toFixed(3)} rad`;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          rotationYValueReset.style.visibility = 'hidden';
+        });
+        anchorCenter.addEventListener('click', () => {
+          testPanel.anchorCenter = !testPanel.anchorCenter;
+          testPanel.updateWorldMatrix();
+          html3d.requestRender = true;
+          testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          if (testPanel.anchorCenter === true) {
+            anchorCenterCheck.style.display = 'block';
+          } else {
+            anchorCenterCheck.style.display = 'none';
+          }
+        });
+        widthInput.value = testPanel.width;
+        widthValue.textContent = `${testPanel.width} px`;
+        heightInput.value = testPanel.height;
+        heightValue.textContent = `${testPanel.height} px`;
+        xInput.value = testPanel.x;
+        xValue.textContent = `${testPanel.x} px`;
+        xValueReset.style.visibility = (testPanel.x === 0) ? 'hidden' : 'visible';
+        yInput.value = testPanel.y;
+        yValue.textContent = `${testPanel.y} px`;
+        yValueReset.style.visibility = (testPanel.y === 0) ? 'hidden' : 'visible';
+        zInput.value = testPanel.z;
+        zValue.textContent = `${testPanel.z} px`;
+        zValueReset.style.visibility = (testPanel.z === 0) ? 'hidden' : 'visible';
+        rotationXInput.value = (testPanel.rotationX * (180 / Math.PI)).toFixed(3);
+        rotationXValue.textContent = `${testPanel.rotationX.toFixed(3)} rad`;
+        rotationXValueReset.style.visibility = (testPanel.rotationX === 0) ? 'hidden' : 'visible';
+        rotationYInput.value = (testPanel.rotationY * (180 / Math.PI)).toFixed(3);
+        rotationYValue.textContent = `${testPanel.rotationY.toFixed(3)} rad`;
+        rotationYValueReset.style.visibility = (testPanel.rotationY === 0) ? 'hidden' : 'visible';
+        if (testPanel.anchorCenter === true) {
+          anchorCenterCheck.style.display = 'block';
+        } else {
+          anchorCenterCheck.style.display = 'none';
+        }
+      },
+      animate(html3d, panel) {
+        const activeElId = document.activeElement?.id;
+        if (activeElId === 'testPanelControllerPanel_width' ||
+            activeElId === 'testPanelControllerPanel_height' ||
+            activeElId === 'testPanelControllerPanel_x' ||
+            activeElId === 'testPanelControllerPanel_y' ||
+            activeElId === 'testPanelControllerPanel_z' ||
+            activeElId === 'testPanelControllerPanel_rotationXdegrees' ||
+            activeElId === 'testPanelControllerPanel_rotationYdegrees') {
+          if (panel.userData.idHasFocus !== activeElId) {
+            if (panel.userData.idHasFocus !== null) {
+              document.getElementById(panel.userData.idHasFocus).style.backgroundColor = '#ffffff';
+            }
+            panel.userData.idHasFocus = activeElId;
+            document.activeElement.style.backgroundColor = '#99ddff';
+          }
+        } else {
+          if (panel.userData.idHasFocus !== null) {
+            document.getElementById(panel.userData.idHasFocus).style.backgroundColor = '#ffffff';
+            panel.userData.idHasFocus = null;
+          }
+        }
+      }
+    },
+    {
+      id: 'testPanel',
+      width: 600,
+      height: 400,
+      x: 0,
+      y: -1250,
+      z: 0,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#ffffff',
+      innerHTML: `
+        <div id="testPanelContainer" style="position: absolute; left: 0px; top: 0px; width: 380px; height: 380px; border: 5px solid #000000; padding: 5px; background-color: #ffffff; color: #000000; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto;">
+          <pre id="testPanelContent" style="margin-block-start: 0;"></pre>
+        </div>
+      `,
+      init(html3d, panel) {
+        const testPanelContainer = document.getElementById('testPanelContainer');
+        const testPanelContent = document.getElementById('testPanelContent');
+        testPanelContainer.style.width = `${panel.width - 20}px`;
+        testPanelContainer.style.height = `${panel.height - 20}px`;
+        testPanelContent.innerHTML = JSON.stringify(panel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      },
+    },
+    {
+      id: 'testPanelAxisX',
+      relativeToId: 'testPanel',
+      width: 100,
+      height: 10,
+      anchorCenter: true,
+      x: 0,
+      y: 0,
+      z: 0,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: false,
+      backgroundColor: '#ff0000'
+    },
+    {
+      id: 'testPanelAxisY',
+      relativeToId: 'testPanel',
+      width: 10,
+      height: 100,
+      anchorCenter: true,
+      x: 0,
+      y: 0,
+      z: 0,
+      rotationX: 0,
+      rotationY: Math.PI / 2,
+      obstruction: false,
+      interaction: false,
+      backgroundColor: '#00ff00'
+    },
+    {
+      id: 'testPanelAxisZ',
+      relativeToId: 'testPanel',
+      width: 10,
+      height: 100,
+      anchorCenter: true,
+      x: 0,
+      y: 0,
+      z: 0,
+      rotationX: Math.PI / 2,
+      rotationY: 0,
+      obstruction: false,
+      interaction: false,
+      backgroundColor: '#0000ff'
+    },
+    {
+      id: 'arcadeCabinet',
+      width: 1100,
+      height: 1400,
+      x: 3000,
+      y: -1400,
+      z: -2000,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#333333'
+    },
+    {
+      id: 'arcadeCabinetFront',
+      width: 1100,
+      height: 1400,
+      x: 3000,
+      y: -1400,
+      z: -2000,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#333333'
+    },
+    {
+      id: 'arcadeCabinetBack',
+      width: 1100,
+      height: 1400,
+      x: 3000,
+      y: -1400,
+      z: -2300,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#333333'
+    },
+    {
+      id: 'arcadeCabinetLeft',
+      width: 300,
+      height: 1400,
+      x: 3000,
+      y: -1400,
+      z: -2300,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#222222'
+    },
+    {
+      id: 'arcadeCabinetRight',
+      width: 300,
+      height: 1400,
+      x: 4100,
+      y: -1400,
+      z: -2300,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#222222'
+    },
+    {
+      id: 'arcadeCabinetIframe',
+      width: 1000,
+      height: 600,
+      x: 3050,
+      y: -1200,
+      z: -1990,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: false,
+      backgroundColor: '#333333',
+      userData: {
+        arcadeStarted: false,
+        hasFocus: false
+      },
+      iframeHtml: `
+        <html>
+          <head>
+            <title>Inception Arcade Game</title>
+            <style>
+              body, html {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+              }
+            </style>
+          </head>
+          <body>
+            <div style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: #000000;">
+              <div style="position: absolute; left: 0px; top: 150px; width: 100%; height: 300px;">
+                <div style="position: absolute; left: 0px; top: 16px; width: 100%; height: 150px; color: #F80000; font-size: 74px; letter-spacing: -6px; text-shadow: 0 0 20px #ff0000; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+                  inCEPTION
+                </div>
+                <div style="position: absolute; left: 0px; top: 12px; width: 100%; height: 150px; color: #F80000; font-size: 73px; letter-spacing: -5px; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+                  inCEPTION
+                </div>
+                <div style="position: absolute; left: 0px; top: 8px; width: 100%; height: 150px; color: #F80000; font-size: 72px; letter-spacing: -4px; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+                  inCEPTION
+                </div>
+                <div style="position: absolute; left: 0px; top: 4px; width: 100%; height: 150px; color: #F80000; font-size: 71px; letter-spacing: -3px; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+                  inCEPTION
+                </div>
+                <div style="position: absolute; left: 0px; top: 0px; width: 100%; height: 150px; color: #FFDF00; font-size: 70px; letter-spacing: -2px; text-shadow: 0 0 3px #000000; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+                  inCEPTION
+                </div>
+              </div>
+              <div style="position: absolute; left: 0px; top: 400px; width: 100%; height: 50px; background-color: transparent; line-height: 50px; font-family: Tahoma, Verdana, sans-serif; font-size: 28px; transform: scale(1.5, 1); text-align: center; color: #ffffff; text-shadow: 0 0 10px #ffffff;">
+                PRESS <span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 30px; height: 30px;" fill="#ffffff" stroke="none">
+                  <path d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"></path>
+                </svg></span> TO START
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+      init(html3d, panel) {
+        panel.userData.arcadeStarted = false;
+      },
+      animate(html3d, panel) {
+        if (document.activeElement === panel.iframe) {
+          if (!panel.userData.hasFocus) {
+            panel.userData.hasFocus = true;
+            panel.element.style.borderColor = '#0088ff';
+          }
+        } else {
+          if (panel.userData.hasFocus) {
+            panel.userData.hasFocus = false;
+            panel.element.style.borderColor = '#333333';
+          }
+        }
+      }
+    },
+    {
+      id: 'arcadeCabinetFrontTop',
+      width: 1100,
+      height: 150,
+      x: 3000,
+      y: -1400,
+      z: -1650,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#444444',
+      innerHTML: `
+        <div style="position: absolute; left: 0px; top: 10px; width: 1100px; height: 150px; color: #F80000; font-size: 74px; letter-spacing: -6px; text-shadow: 0 0 10px #000000; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+          inCEPTION
+        </div>
+        <div style="position: absolute; left: 0px; top: 8px; width: 1100px; height: 150px; color: #F80000; font-size: 73px; letter-spacing: -5px; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+          inCEPTION
+        </div>
+        <div style="position: absolute; left: 0px; top: 4px; width: 1100px; height: 150px; color: #F80000; font-size: 72px; letter-spacing: -4px; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+          inCEPTION
+        </div>
+        <div style="position: absolute; left: 0px; top: 0px; width: 1100px; height: 150px; color: #F80000; font-size: 71px; letter-spacing: -3px; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+          inCEPTION
+        </div>
+        <div style="position: absolute; left: 0px; top: -4px; width: 1100px; height: 150px; color: #FFDF00; font-size: 70px; letter-spacing: -2px; text-shadow: 0 0 3px #000000; text-align: center; line-height: 150px; font-family: Tahoma, Arial; font-weight: bold; transform-origin: 50% 50%; transform: scale(1, 6) perspective(1000px) rotateX(80deg);">
+          inCEPTION
+        </div>
+      `,
+      init(html3d, panel) {
+        document.getElementById('arcadeCabinetFrontTop').style.backgroundImage = 'radial-gradient(#444444 60%, #4444ff 100%)';
+      }
+    },
+    {
+      id: 'arcadeCabinetFrontBottom',
+      width: 1100,
+      height: 220,
+      x: 3000,
+      y: -550,
+      z: -1650,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#444444'
+    },
+    {
+      id: 'arcadeCabinetFrontTopLeft',
+      width: 350,
+      height: 150,
+      x: 3000,
+      y: -1400,
+      z: -2000,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#222222'
+    },
+    {
+      id: 'arcadeCabinetFrontTopRight',
+      width: 350,
+      height: 150,
+      x: 4100,
+      y: -1400,
+      z: -2000,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#222222'
+    },
+    {
+      id: 'arcadeCabinetFrontTopTop',
+      width: 1100,
+      height: 350,
+      x: 3000,
+      y: -1250,
+      z: -1650,
+      rotationX: -(Math.PI / 2),
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#111111'
+    },
+    {
+      id: 'arcadeCabinetFrontBottomLeft',
+      width: 350,
+      height: 220,
+      x: 3000,
+      y: -550,
+      z: -2000,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#222222'
+    },
+    {
+      id: 'arcadeCabinetFrontBottomRight',
+      width: 350,
+      height: 220,
+      x: 4100,
+      y: -550,
+      z: -2000,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#222222'
+    },
+    {
+      id: 'arcadeCabinetFrontBottomTop',
+      width: 1100,
+      height: 350,
+      x: 3000,
+      y: -550,
+      z: -2000,
+      rotationX: (Math.PI / 2),
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#111111'
+    },
+    {
+      id: 'arcadeCabinetFrontBottomDescription',
+      width: 600,
+      height: 165,
+      x: (3000 + 25), 
+      y: -525,
+      z: -1640,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#111111',
+      innerHTML: `
+        <div style="width: 550px; margin-left: 15px; margin-top: 2px; color: #ffffff; font-size: 20px;" >
+          <span style="font-size: 40px;">🛈</span><br />
+          Click on the game screen to give it focus. You can then move about the game scene using your keyboard, by pressing WASD or arrow keys.
+          Click outside the game screen, such as on this text, to resume control of this scene.
+        </div>
+      `,
+      init(html3d, panel) {
+        const arcadeCabinetFrontBottomDescription = document.getElementById('arcadeCabinetFrontBottomDescription');
+        arcadeCabinetFrontBottomDescription.style.visibility = 'hidden';
+      }
+    },
+    {
+      id: 'arcadeCabinetFrontBottomStartButton',
+      width: 110,
+      height: 110,
+      x: (4100 - 135),
+      y: -525,
+      z: -1640,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: 'transparent',
+      innerHTML: `
+        <div id="arcadeCabinetFrontBottomStartButton_div" title="Start or stop the game." style="position: absolute; left: 10px; top: 10px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; color: #ffffff; text-align: center; box-shadow: 0 0 15px #FFDF00;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 15px; top: 15px; width: 50px; height: 50px;" fill="#ffffff" stroke="none">
+            <path d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"></path>
+          </svg>
+        </div>
+      `,
+      userData: {
+        startupSequence: false
+      },
+      init(html3d, panel) {
+        panel.userData.startupSequence = false;
+      },
+      animate(html3d, panel) {
+        if (panel.userData.startupSequence) {
+          const iframePanel = html3d.panels.find((so) => so.id === 'arcadeCabinetIframe');
+          if (iframePanel.userData.arcadeStarted) {
+            if (iframePanel.iframe.contentWindow?.html3dInstance) {
+              const iframeHtml3dInstance = iframePanel.iframe.contentWindow.html3dInstance;
+              iframeHtml3dInstance.camera.fov += 0.7;
+              if (iframeHtml3dInstance.camera.fov > html3d.camera.fov) {
+                iframeHtml3dInstance.camera.fov = html3d.camera.fov;
+                panel.userData.startupSequence = false;
+
+                const importButton = document.getElementById('arcadeCabinetFrontBottomImportSceneButton');
+                importButton.style.visibility = 'visible';
+                const exportButton = document.getElementById('arcadeCabinetFrontBottomExportSceneButton');
+                exportButton.style.visibility = 'visible';
+
+              }
+              iframeHtml3dInstance.camera.updateWorldMatrix();
+              iframeHtml3dInstance.requestRender = true;
+            } else {
+              panel.userData.startupSequence = false;
+            }
+          } else {
+            panel.userData.startupSequence = false;
+          }
+        }
+      },
+      click(html3d, panel) {
+        const iframePanel = html3d.panels.find((so) => so.id === 'arcadeCabinetIframe');
+        if (iframePanel.userData.arcadeStarted !== true) {
+          iframePanel.userData.arcadeStarted = true;
+          AUDIO.samples.newGame.play();
+          iframePanel.element.style.pointerEvents = 'auto';
+          iframePanel.element.style.userSelect = 'auto';
+          iframePanel.iframe.style.visibility = 'hidden';
+          iframePanel.iframe.srcdoc = pageCode;
+          setTimeout(() => {
+            const iframePanel = html3d.panels.find((so) => so.id === 'arcadeCabinetIframe');
+            if (iframePanel.iframe.contentWindow?.html3dInstance) {
+              const iframeHtml3dInstance = iframePanel.iframe.contentWindow.html3dInstance;
+              iframeHtml3dInstance.camera.fov = 5;
+              iframeHtml3dInstance.camera.updateWorldMatrix();
+              iframeHtml3dInstance.requestRender = true;
+              iframePanel.iframe.style.visibility = 'visible';
+              panel.userData.startupSequence = true;
+            }
+            if (iframePanel.iframe.contentWindow?.AUDIO_enable) {
+              iframePanel.iframe.contentWindow.AUDIO_enable(AUDIO_enabled());
+            }
+          }, 100);
+          const arcadeCabinetFrontBottomStartButton_div = document.getElementById('arcadeCabinetFrontBottomStartButton_div');
+          arcadeCabinetFrontBottomStartButton_div.style.border = '5px solid #55F755';
+          arcadeCabinetFrontBottomStartButton_div.style.boxShadow = '0 0 15px #00F700';
+          arcadeCabinetFrontBottomStartButton_div.style.textShadow = '0 0 8px #55F755';
+          const arcadeCabinetFrontBottomDescription = document.getElementById('arcadeCabinetFrontBottomDescription');
+          arcadeCabinetFrontBottomDescription.style.visibility = 'visible';
+        } else {
+          panel.userData.startupSequence = false;
+          iframePanel.userData.arcadeStarted = false;
+          iframePanel.element.style.pointerEvents = 'none';
+          iframePanel.element.style.userSelect = 'none';
+          iframePanel.iframe.srcdoc = iframePanel.iframeHtml;
+          const arcadeCabinetFrontBottomStartButton_div = document.getElementById('arcadeCabinetFrontBottomStartButton_div');
+          arcadeCabinetFrontBottomStartButton_div.style.border = '5px solid #FFDF00';
+          arcadeCabinetFrontBottomStartButton_div.style.boxShadow = '0 0 15px #F77C00';
+          arcadeCabinetFrontBottomStartButton_div.style.textShadow = '0 0 8px #F77C00';
+          const arcadeCabinetFrontBottomDescription = document.getElementById('arcadeCabinetFrontBottomDescription');
+          arcadeCabinetFrontBottomDescription.style.visibility = 'hidden';
+          const importButton = document.getElementById('arcadeCabinetFrontBottomImportSceneButton');
+          importButton.style.visibility = 'hidden';
+          const exportButton = document.getElementById('arcadeCabinetFrontBottomExportSceneButton');
+          exportButton.style.visibility = 'hidden';
+        }
+      }
+    },
+    {
+      id: 'arcadeCabinetFrontBottomImportSceneButton',
+      width: 280,
+      height: 60,
+      x: (3000 + 670), 
+      y: -525,
+      z: -1640,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: 'transparent',
+      innerHTML: `
+        <div id="arcadeCabinetFrontBottomImportSceneButton_div" title="Make a snapshot copy of your current scene and set it as the game scene.\nEverything in the game will be in the same state as your current scene. However, to prevent endless recursion, the game-in-the-game is not started automatically. You can start the game-in-the-game manually by clicking its start button." style="position: absolute; left: 10px; top: 10px; width: 240px; height: 60px; border: 5px solid #00FFDF; border-radius: 10px; background-color: transparent; box-shadow: 0 0 5px #00FFDF; text-shadow: 0 0 2px #00FFDF; cursor: pointer;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 5px; top: 10px; width: 40px; height: 40px;" fill="#ffffff" stroke="none">
+            <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z"></path>
+          </svg>
+          <div style="position: absolute; left: 60px; top: 10px; width: 180px; height: 40px; line-height: 20px; color: #ffffff; text-align: left; font-size: 18px; font-family: Arial; font-weight: bold; white-space: nowrap; overflow: hidden;">
+            copy your scene<br />
+            into the game
+          </div>
+        </div>
+      `,
+      init(html3d, panel) {
+        const importButton = document.getElementById('arcadeCabinetFrontBottomImportSceneButton');
+        importButton.style.visibility = 'hidden';
+        const importButton_div = document.getElementById('arcadeCabinetFrontBottomImportSceneButton_div');
+        importButton_div.addEventListener('click', () => {
+          const arcadeCabinetFrontBottomStartButtonPanel = html3d.panels.find(p => p.id === 'arcadeCabinetFrontBottomStartButton'); 
+          if (arcadeCabinetFrontBottomStartButtonPanel.userData.startupSequence) {
+            return;
+          }
+          const iframeContentWindow = html3d.panels.find(p => p.id === 'arcadeCabinetIframe').iframe.contentWindow;
+          if (iframeContentWindow?.html3dInstance) {
+            iframeContentWindow.AUDIO_enable(AUDIO_enabled());
+            AUDIO.samples.copyIntoGame.play();
+            const sceneData = html3d.export();
+            iframeContentWindow.html3dInstance.import(sceneData);
+          }
+        });
+      }
+    },
+    {
+      id: 'arcadeCabinetFrontBottomExportSceneButton',
+      width: 280,
+      height: 60,
+      x: (3000 + 670), 
+      y: (-525) + 80,
+      z: -1640,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: 'transparent',
+      innerHTML: `
+        <div id="arcadeCabinetFrontBottomExportSceneButton_div" title="Teleport into the game scene.\nEverything will be the same as in the game, but in-game games and videos are reset." style="position: absolute; left: 10px; top: 10px; width: 240px; height: 60px; border: 5px solid #00FFDF; border-radius: 10px; background-color: transparent; box-shadow: 0 0 5px #00FFDF; text-shadow: 0 0 2px #00FFDF; cursor: pointer;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 5px; top: 10px; width: 40px; height: 40px;" fill="#ffffff" stroke="none">
+            <path d="M14 12L10 8V11H2V13H10V16M22 12A10 10 0 0 1 2.46 15H4.59A8 8 0 1 0 4.59 9H2.46A10 10 0 0 1 22 12Z"></path>
+          </svg>
+          <div style="position: absolute; left: 60px; top: 10px; width: 180px; height: 40px; line-height: 20px; color: #ffffff; text-align: left; font-size: 18px; font-family: Arial; font-weight: bold; white-space: nowrap; overflow: hidden;">
+            teleport into the<br />
+            game scene
+          </div>
+        </div>
+      `,
+      init(html3d, panel) {
+        const exportButton = document.getElementById('arcadeCabinetFrontBottomExportSceneButton');
+        exportButton.style.visibility = 'hidden';
+        const exportButton_div = document.getElementById('arcadeCabinetFrontBottomExportSceneButton_div');
+        exportButton_div.addEventListener('click', () => {
+          const arcadeCabinetFrontBottomStartButtonPanel = html3d.panels.find(p => p.id === 'arcadeCabinetFrontBottomStartButton'); 
+          if (arcadeCabinetFrontBottomStartButtonPanel.userData.startupSequence) {
+            return;
+          }
+          const iframeContentWindow = html3d.panels.find(p => p.id === 'arcadeCabinetIframe').iframe.contentWindow;
+          if (iframeContentWindow?.html3dInstance) {
+            AUDIO_enable(iframeContentWindow.AUDIO_enabled());
+            AUDIO.samples.teleportIntoGame.play();
+            const sceneData = iframeContentWindow?.html3dInstance.export();
+            html3d.import(sceneData);
+          }
+
+        });
+      }
+    },
+    {
+      id: 'firstFloorTelevision',
+      width: 1800,
+      height: 1000,
+      x: (buildingWidth / 4) - 900,
+      y: ((-(wallHeight + floorDepth)) - ((wallHeight / 2) + 500)),
+      z: (-buildingDepth / 2) + 100,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: false,
+      backgroundColor: '#000000',
+      iframeSrc: 'about:blank',
+      userData: {
+        isOn: false,
+        hasFocus: false
+      },
+      init(html3d, panel) {
+        panel.userData.isOn = false;
+      },
+      animate(html3d, panel) {
+        if (document.activeElement === panel.iframe) {
+          if (!panel.userData.hasFocus) {
+            panel.userData.hasFocus = true;
+            panel.element.style.borderColor = '#0088ff';
+          }
+        } else {
+          if (panel.userData.hasFocus) {
+            panel.userData.hasFocus = false;
+            panel.element.style.borderColor = '#000000';
+          }
+        }
+      }
+    },
+    {
+      id: 'firstFloorTelevisionControls',
+      width: 160,
+      height: 160,
+      x: (buildingWidth / 4) + 900 + 40,
+      y: ((-(wallHeight + floorDepth)) - ((wallHeight / 2) + 80)),
+      z: (-buildingDepth / 2) + 100,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: true,
+      backgroundColor: '#444444',
+      innerHTML: `
+        <div id="firstFloorTelevisionControls_onOffButton" title="Watch a YouTube video.\n\nWhen switching on, the video will not play automatically, you need to press play.\nAfter pressing play, click outside the video to regain keyboard movement control." style="position: absolute; left: 35px; top: 35px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; box-shadow: 0 0 15px #FFDF00;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 15px; top: 15px; width: 50px; height: 50px;" fill="#ffffff" stroke="none">
+            <path d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"></path>
+          </svg>
+        </div>
+      `,
+      click(html3d, panel) {
+        const firstFloorTelevision = html3d.panels.find((so) => so.id === 'firstFloorTelevision');
+        const onOffButton = document.getElementById('firstFloorTelevisionControls_onOffButton');
+        if (firstFloorTelevision.userData.isOn === false) {
+          firstFloorTelevision.iframe.src = 'https://www.youtube.com/embed/BiQXFKYa-co?autoplay=0&mute=0&controls=1&loop=0';
+          firstFloorTelevision.element.style.pointerEvents = 'auto';
+          firstFloorTelevision.element.style.userSelect = 'auto';
+          firstFloorTelevision.userData.isOn = true;
+          onOffButton.style.border = '5px solid #55F755';
+          onOffButton.style.boxShadow = '0 0 15px #00F700';
+          onOffButton.style.textShadow = '0 0 8px #55F755';
+        } else {
+          firstFloorTelevision.iframe.src = '';
+          firstFloorTelevision.element.style.pointerEvents = 'none';
+          firstFloorTelevision.element.style.userSelect = 'none';
+          firstFloorTelevision.userData.isOn = false;
+          onOffButton.style.border = '5px solid #FFDF00';
+          onOffButton.style.boxShadow = '0 0 15px #F77C00';
+          onOffButton.style.textShadow = '0 0 8px #F77C00';
+        }
+      }
+    },
+    {
+      id: 'firstFloorWall',
+      width: (buildingDepth - 2500),
+      height: wallHeight,
+      x: 0,
+      y: (-(wallHeight + floorDepth + wallHeight)),
+      z: -(buildingDepth / 2),
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#F4F4F4'
+    },
+    {
+      id: 'digitalRain',
+      width: 2500,
+      height: wallHeight,
+      x: 0,
+      y: (-(wallHeight + floorDepth + wallHeight)),
+      z: (buildingDepth / 2) - 2500,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: false,
+      interaction: false,
+      backgroundColor: '#000000',
+      opacity: 0.6,
+      innerHTML: `
+        <canvas id="digitalRain_canvas" width=${2500} height=${wallHeight} style="display: block; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%;"></canvas>
+      `,
+      userData: {
+        canvas: null,
+        ctx: null,
+        fontSize: 40,
+        characters: 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+        drops: [],
+        lastAnimateMs: 0,
+        animateIntervalMs: 100
+      },
+      init(html3d, panel) {
+        panel.userData.canvas = document.getElementById('digitalRain_canvas');
+        panel.userData.ctx = panel.userData.canvas.getContext('2d');
+        const columns = Math.floor(panel.userData.canvas.width / panel.userData.fontSize);
+        panel.userData.drops = [];
+        for (let i = 0; i < columns; i++) {
+          panel.userData.drops[i] = (Math.random() * panel.userData.canvas.height) / panel.userData.fontSize;
+        }
+        panel.userData.lastAnimateMs = 0;
+      },
+      animate(html3d, panel) {
+        if (performance.now() - panel.userData.lastAnimateMs > panel.userData.animateIntervalMs) {
+          panel.userData.lastAnimateMs = performance.now();
+          const ctx = panel.userData.ctx;
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+          ctx.fillRect(0, 0, panel.userData.canvas.width, panel.userData.canvas.height);
+          ctx.fillStyle = '#00ff00';
+          ctx.font = panel.userData.fontSize + 'px monospace';
+          for (let i = 0; i < panel.userData.drops.length; i++) {
+            const character = panel.userData.characters[Math.floor(Math.random() * panel.userData.characters.length)];
+            const x = i * panel.userData.fontSize;
+            const y = panel.userData.drops[i] * panel.userData.fontSize;
+            const brightness = (Math.random() * 0.5) + 0.5;
+            ctx.fillStyle = `rgba(0, ${Math.floor(255 * brightness)}, 0, ${brightness})`;
+            ctx.fillText(character, x, y);
+            if ((y > panel.userData.canvas.height) || (Math.random() > 0.98)) {
+              panel.userData.drops[i] = 0;
+            }
+            if (Math.random() < 0.75) {
+              panel.userData.drops[i]++;
+            }
+          }
+        }
+      }
+    }
+  ]
+};
+
+window.html3dInstance = new HTML3D(document.getElementById('container'), SCENE);
+
+// DOWNLOADLINKSTART
+// This code is removed in the downloaded html file.
+if (window.location.protocol === 'https:') {
+  const headerpanel = document.getElementById('headerpanel');
+  const headerpaneldownloadlink = document.createElement('div');
+  Object.assign(headerpaneldownloadlink.style, {
+    position: 'absolute',
+    left: '330px',
+    top: '0px',
+    width: '230px',
+    height: '40px'
+  });
+  headerpanel.appendChild(headerpaneldownloadlink);
+  const downloadlink = document.createElement('div');
+  downloadlink.title = 'HTML3D is a portable web app. All the JavaScript code is in the html file.\nClick here to download the html file and run/edit it offline.';
+  Object.assign(downloadlink.style, {
+    position: 'absolute',
+    left: '10px',
+    top: '8px',
+    width: '220px',
+    height: '24px',
+    cursor: 'pointer'
+  });
+  headerpaneldownloadlink.appendChild(downloadlink);
+  const downloadlink_svg = document.createElement('div');
+  Object.assign(downloadlink_svg.style, {
+    position: 'absolute',
+    left: '0px',
+    top: '0px',
+    width: '24px',
+    height: '24px',
+    cursor: 'pointer'
+  });
+  downloadlink_svg.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+      <path fill="#ffffff" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
+    </svg>
+  `;
+  downloadlink.appendChild(downloadlink_svg);
+  const downloadlink_text = document.createElement('div');
+  Object.assign(downloadlink_text.style, {
+    position: 'absolute',
+    left: '35px',
+    top: '0px',
+    width: '185px',
+    height: '24px',
+    color: '#ffffff',
+    fontSize: '12px',
+    lineHeight: '24px',
+    whiteSpace: 'nowrap'
+  });
+  downloadlink_text.innerHTML = 'Download HTML3D';
+  downloadlink.appendChild(downloadlink_text);
+  let downloaded = false;
+  downloadlink.addEventListener('click', async () => {
+    if (downloaded) {
+      return;
+    }
+    downloaded = true;
+    downloadlink.title = '';
+    downloadlink.style.cursor = 'default';
+    downloadlink_svg.style.display = 'none';
+    downloadlink_text.innerHTML = 'downloading HTML3D ...';
+    try {
+      const response = await fetch(window.location.href);
+      let html = await response.text();
+      html = html.replace(/\/\/ DOWNLOADLINKSTART[\s\S]*?\/\/ DOWNLOADLINKEND/g, '');
+      const blob = new Blob([html], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateYYYYMMDD = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      a.href = url;
+      a.download = `html3d_${dateYYYYMMDD}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+      downloadlink_text.innerHTML = 'downloaded to Downloads folder';
+      setTimeout(() => {
+        downloadlink_text.innerHTML = '';
+      }, 2000);
+    } catch (error) {
+      downloadlink_text.innerHTML = 'download error';
+      setTimeout(() => {
+        downloadlink_text.innerHTML = '';
+      }, 2000);
+    }
+  });
+}
+// DOWNLOADLINKEND
+
+</script>
+</body>
+</html>
