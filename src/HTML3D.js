@@ -633,9 +633,10 @@ class HTML3D {
       return this;
     }
     intersectsBox(box) {
-      return this.max.x >= box.min.x && this.min.x <= box.max.x &&
-        this.max.y >= box.min.y && this.min.y <= box.max.y &&
-        this.max.z >= box.min.z && this.min.z <= box.max.z;
+      return (this.max.x >= box.min.x) && (this.min.x <= box.max.x) && 
+        (this.max.y >= box.min.y) && (this.min.y <= box.max.y) && 
+        (this.max.z >= box.min.z) && (this.min.z <= box.max.z);
     }
   }
 }
+
