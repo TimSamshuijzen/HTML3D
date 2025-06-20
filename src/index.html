@@ -1298,7 +1298,8 @@ const SCENE = {
         opening: false,
         closing: false,
         opened: false,
-        waitAnimate: false
+        waitAnimate: false,
+        startAnimateMs: 0
       },
       click(html3d, panel) {
         if ((panel.userData.opening !== true) && (panel.userData.closing !== true)) {
@@ -1343,6 +1344,7 @@ const SCENE = {
               oscillator3.stop(AUDIO.audioCtx.currentTime + 0.6);
             }
             panel.userData.waitAnimate = false;
+            panel.userData.startAnimateMs = performance.now();
           });
         }
       },
@@ -1351,8 +1353,8 @@ const SCENE = {
           return;
         }
         if (panel.userData.opening === true) {
-          const doorSpeed = 40;
-          panel.x += doorSpeed;
+          const elapsedMs = performance.now() - panel.userData.startAnimateMs;
+          panel.x = (doorWidth - 200) * (elapsedMs / 600);
           if (panel.x > (doorWidth - 200)) {
             panel.x = doorWidth - 200;
             panel.userData.opening = false;
@@ -1361,10 +1363,10 @@ const SCENE = {
           panel.updateWorldMatrix();
           html3d.requestRender = true;
         } else if (panel.userData.closing === true) {
-          const doorSpeed = 40;
-          panel.x -= doorSpeed;
+          const elapsedMs = performance.now() - panel.userData.startAnimateMs;
+          panel.x = (doorWidth - 200) - ((doorWidth - 200) * (elapsedMs / 600));
           if (panel.x < 0) {
-            panel.x = 0
+            panel.x = 0;
             panel.userData.closing = false;
             panel.userData.opened = false;
           }
@@ -1654,7 +1656,8 @@ const SCENE = {
         goingDown: false,
         isUp: false,
         animateCameraOnElevator: false,
-        waitAnimate: false
+        waitAnimate: false,
+        startAnimateMs: 0
       },
       animate(html3d, panel) {
         const elevatorObject = panel;
@@ -1662,8 +1665,7 @@ const SCENE = {
           return;
         }
         if (elevatorObject.userData.goingUp === true) {
-          const elevatorSpeed = 20;
-          elevatorObject.y -= elevatorSpeed;
+          elevatorObject.y = -(10 + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1800)));
           if (elevatorObject.y < (-(wallHeight + floorDepth))) {
             elevatorObject.y = -(wallHeight + floorDepth);
             elevatorObject.userData.goingUp = false;
@@ -1676,8 +1678,7 @@ const SCENE = {
           }
           html3d.requestRender = true;
         } else if (elevatorObject.userData.goingDown === true) {
-          const elevatorSpeed = 20;
-          elevatorObject.y += elevatorSpeed;
+          elevatorObject.y = (-(10 + (wallHeight + floorDepth))) + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1800));
           if (elevatorObject.y > -10) {
             elevatorObject.y = -10;
             elevatorObject.userData.goingDown = false;
@@ -1775,6 +1776,7 @@ const SCENE = {
               oscillator3.stop(AUDIO.audioCtx.currentTime + 1.7);
             }
             elevatorObject.userData.waitAnimate = false;
+            elevatorObject.userData.startAnimateMs = performance.now();
           });
         }
       }
@@ -1861,6 +1863,7 @@ const SCENE = {
               oscillator3.stop(AUDIO.audioCtx.currentTime + 1.7);
             }
             elevatorObject.userData.waitAnimate = false;
+            elevatorObject.userData.startAnimateMs = performance.now();
           });
         }
       }
