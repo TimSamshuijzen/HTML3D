@@ -2712,7 +2712,7 @@ const SCENE = {
       }
     },
     {
-      id: 'firstFloorTelevision',
+      id: 'firstFloorYouTubeVideo',
       width: 1800,
       height: 1000,
       x: (buildingWidth / 4) - 900,
@@ -2746,7 +2746,7 @@ const SCENE = {
       }
     },
     {
-      id: 'firstFloorTelevisionControls',
+      id: 'firstFloorYouTubeVideoControls',
       width: 160,
       height: 160,
       x: (buildingWidth / 4) + 900 + 40,
@@ -2758,28 +2758,28 @@ const SCENE = {
       interaction: true,
       backgroundColor: '#444444',
       innerHTML: `
-        <div id="firstFloorTelevisionControls_onOffButton" title="Watch a YouTube video.\n\nWhen switching on, the video will not play automatically, you need to press play.\nAfter pressing play, click outside the video to regain keyboard movement control." style="position: absolute; left: 35px; top: 35px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; box-shadow: 0 0 15px #FFDF00;">
+        <div id="firstFloorYouTubeVideoControls_onOffButton" title="Watch a YouTube video.\n\nWhen switching on, the video will not play automatically, you need to press play.\nAfter pressing play, click outside the video to regain keyboard movement control." style="position: absolute; left: 35px; top: 35px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; box-shadow: 0 0 15px #FFDF00;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 15px; top: 15px; width: 50px; height: 50px;" fill="#ffffff" stroke="none">
             <path d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"></path>
           </svg>
         </div>
       `,
       click(html3d, panel) {
-        const firstFloorTelevision = html3d.panels.find((so) => so.id === 'firstFloorTelevision');
-        const onOffButton = document.getElementById('firstFloorTelevisionControls_onOffButton');
-        if (firstFloorTelevision.userData.isOn === false) {
-          firstFloorTelevision.iframe.src = 'https://www.youtube.com/embed/BiQXFKYa-co?autoplay=0&mute=0&controls=1&loop=0';
-          firstFloorTelevision.element.style.pointerEvents = 'auto';
-          firstFloorTelevision.element.style.userSelect = 'auto';
-          firstFloorTelevision.userData.isOn = true;
+        const firstFloorYouTubeVideo = html3d.panels.find((so) => so.id === 'firstFloorYouTubeVideo');
+        const onOffButton = document.getElementById('firstFloorYouTubeVideoControls_onOffButton');
+        if (firstFloorYouTubeVideo.userData.isOn === false) {
+          firstFloorYouTubeVideo.iframe.src = 'https://www.youtube.com/embed/BiQXFKYa-co?autoplay=0&mute=0&controls=1&loop=0';
+          firstFloorYouTubeVideo.element.style.pointerEvents = 'auto';
+          firstFloorYouTubeVideo.element.style.userSelect = 'auto';
+          firstFloorYouTubeVideo.userData.isOn = true;
           onOffButton.style.border = '5px solid #55F755';
           onOffButton.style.boxShadow = '0 0 15px #00F700';
           onOffButton.style.textShadow = '0 0 8px #55F755';
         } else {
-          firstFloorTelevision.iframe.src = '';
-          firstFloorTelevision.element.style.pointerEvents = 'none';
-          firstFloorTelevision.element.style.userSelect = 'none';
-          firstFloorTelevision.userData.isOn = false;
+          firstFloorYouTubeVideo.iframe.src = '';
+          firstFloorYouTubeVideo.element.style.pointerEvents = 'none';
+          firstFloorYouTubeVideo.element.style.userSelect = 'none';
+          firstFloorYouTubeVideo.userData.isOn = false;
           onOffButton.style.border = '5px solid #FFDF00';
           onOffButton.style.boxShadow = '0 0 15px #F77C00';
           onOffButton.style.textShadow = '0 0 8px #F77C00';
@@ -2813,16 +2813,16 @@ const SCENE = {
       backgroundColor: '#000000',
       opacity: 0.6,
       innerHTML: `
-        <canvas id="digitalRain_canvas" width=${2500} height=${wallHeight} style="display: block; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%;"></canvas>
+        <canvas id="digitalRain_canvas" width="${(2500/3)|0}" height="${(wallHeight/3)|0}" style="display: block; position: absolute; left: 0px; top: 0px; width: ${2500}px; height: ${wallHeight}px;"></canvas>
       `,
       userData: {
         canvas: null,
         ctx: null,
-        fontSize: 40,
+        fontSize: 16,
         characters: 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
         drops: [],
-        lastAnimateMs: 0,
-        animateIntervalMs: 100
+        lastAnimateCount: 0,
+        animateIntervalCount: 12
       },
       init(html3d, panel) {
         panel.userData.canvas = document.getElementById('digitalRain_canvas');
@@ -2830,13 +2830,14 @@ const SCENE = {
         const columns = Math.floor(panel.userData.canvas.width / panel.userData.fontSize);
         panel.userData.drops = [];
         for (let i = 0; i < columns; i++) {
-          panel.userData.drops[i] = (Math.random() * panel.userData.canvas.height) / panel.userData.fontSize;
+          panel.userData.drops[i] = ((Math.random() * panel.userData.canvas.height) / panel.userData.fontSize) | 0;
         }
-        panel.userData.lastAnimateMs = 0;
+        panel.userData.lastAnimateCount = 0;
       },
       animate(html3d, panel) {
-        if (performance.now() - panel.userData.lastAnimateMs > panel.userData.animateIntervalMs) {
-          panel.userData.lastAnimateMs = performance.now();
+        panel.userData.lastAnimateCount++;
+        if (panel.userData.lastAnimateCount >= panel.userData.animateIntervalCount) {
+          panel.userData.lastAnimateCount = 0;
           const ctx = panel.userData.ctx;
           ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
           ctx.fillRect(0, 0, panel.userData.canvas.width, panel.userData.canvas.height);
@@ -2845,14 +2846,18 @@ const SCENE = {
           for (let i = 0; i < panel.userData.drops.length; i++) {
             const character = panel.userData.characters[Math.floor(Math.random() * panel.userData.characters.length)];
             const x = i * panel.userData.fontSize;
-            const y = panel.userData.drops[i] * panel.userData.fontSize;
+            const y = (panel.userData.drops[i] * panel.userData.fontSize); // + panel.userData.fontSize;
             const brightness = (Math.random() * 0.5) + 0.5;
             ctx.fillStyle = `rgba(0, ${Math.floor(255 * brightness)}, 0, ${brightness})`;
             ctx.fillText(character, x, y);
             if ((y > panel.userData.canvas.height) || (Math.random() > 0.98)) {
               panel.userData.drops[i] = 0;
             }
-            if (Math.random() < 0.75) {
+            if (panel.userData.drops[i] === 0) {
+              if (Math.random() < 0.05) {
+                panel.userData.drops[i] = 1;
+              }
+            } else if (Math.random() < 0.85) {
               panel.userData.drops[i]++;
             }
           }
