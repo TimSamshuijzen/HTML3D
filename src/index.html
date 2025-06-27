@@ -345,9 +345,9 @@ class HTML3D {
       if (this.innerHTML !== null) {
         this.element.innerHTML = this.innerHTML;
       } else if ((this.iframeSrc !== null) || (this.iframeHtml !== null)) {
-        this.element.style.width = (this.width - 6) + 'px';
-        this.element.style.height = (this.height - 6) + 'px';
-        this.element.style.border = '3px solid ' + this.backgroundColor;
+        this.element.style.width = (this.width - 10) + 'px';
+        this.element.style.height = (this.height - 10) + 'px';
+        this.element.style.border = '5px solid ' + this.backgroundColor;
         this.iframe = document.createElement('iframe');
         this.iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         if (this.iframeSrc !== null) {
@@ -359,8 +359,8 @@ class HTML3D {
           position: 'absolute',
           left: '0px',
           top: '0px',
-          width: (this.width - 6) + 'px',
-          height: (this.height - 6) + 'px',
+          width: (this.width - 10) + 'px',
+          height: (this.height - 10) + 'px',
           border: 'none'
         });
         this.element.appendChild(this.iframe);
@@ -883,7 +883,7 @@ const SCENE = {
           </div>
         </div>
         <div id="scenejsonTextareaContainer" style="position: absolute; left: 100px; top: 250px; width: 1020px; height: 920px; background-color: transparent; overflow: visible;">
-          <textarea id="scenejsonTextarea" style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 5px solid #303030; background-color: #ffffff; color: #000000; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
+          <textarea id="scenejsonTextarea" style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #303030; background-color: #ffffff; color: #000000; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
           </textarea>
         </div>
         <div style="position: absolute; left: 1150px; top: 250px; width: 400px; height: 240px; color: #ffffff; font-size: 24px;">
@@ -1665,7 +1665,7 @@ const SCENE = {
           return;
         }
         if (elevatorObject.userData.goingUp === true) {
-          elevatorObject.y = -(10 + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1800)));
+          elevatorObject.y = -(10 + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1700)));
           if (elevatorObject.y < (-(wallHeight + floorDepth))) {
             elevatorObject.y = -(wallHeight + floorDepth);
             elevatorObject.userData.goingUp = false;
@@ -1678,7 +1678,7 @@ const SCENE = {
           }
           html3d.requestRender = true;
         } else if (elevatorObject.userData.goingDown === true) {
-          elevatorObject.y = (-(10 + (wallHeight + floorDepth))) + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1800));
+          elevatorObject.y = (-(10 + (wallHeight + floorDepth))) + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1700));
           if (elevatorObject.y > -10) {
             elevatorObject.y = -10;
             elevatorObject.userData.goingDown = false;
@@ -2715,7 +2715,224 @@ const SCENE = {
       }
     },
     {
-      id: 'firstFloorYouTubeVideo',
+      id: 'firstFloorWall',
+      width: (buildingDepth - 2500),
+      height: wallHeight,
+      x: 0,
+      y: (-(wallHeight + floorDepth + wallHeight)),
+      z: -(buildingDepth / 2),
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: true,
+      interaction: true,
+      backgroundColor: '#F4F4F4'
+    },
+    {
+      id: 'digitalRain',
+      width: (2500 - 200),
+      height: wallHeight,
+      x: 0,
+      y: (-(wallHeight + floorDepth + wallHeight)),
+      z: (buildingDepth / 2) - 2500,
+      rotationX: 0,
+      rotationY: -(Math.PI / 2),
+      obstruction: false,
+      interaction: false,
+      backgroundColor: '#000000',
+      opacity: 0.6,
+      userData: {
+        fontSize: 16,
+        characters: 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+        animateIntervalCount: 12,
+        showPixels: false
+      },
+      init(html3d, panel) {
+        panel.localData = {};
+        panel.localData.canvas = document.createElement('canvas');
+        panel.localData.canvas.setAttribute('width', ((2500 - 200) / 3) | 0);
+        panel.localData.canvas.setAttribute('height', (wallHeight / 3) | 0);
+        Object.assign(panel.localData.canvas.style, {
+          display: 'block',
+          position: 'absolute',
+          left: '0px',
+          top: '0px',
+          width: `${(2500 - 200)}px`,
+          height: `${wallHeight}px`
+        });
+        if (panel.userData.showPixels === true) {
+          panel.localData.canvas.style.imageRendering = 'pixelated';
+          panel.localData.canvas.style.imageRendering = 'crisp-edges';
+        }
+        panel.element.appendChild(panel.localData.canvas);
+        panel.localData.ctx = panel.localData.canvas.getContext('2d');
+        Object.assign(panel.localData, {
+          width: panel.localData.canvas.width,
+          height: panel.localData.canvas.height,
+          lastAnimateCount: 0
+        });
+        panel.localData.drops = [];
+        const columns = Math.floor(panel.localData.canvas.width / panel.userData.fontSize);
+        for (let i = 0; i < columns; i++) {
+          panel.localData.drops.push({
+            rowIndex: ((Math.random() * panel.localData.canvas.height) / panel.userData.fontSize) | 0,
+            onceBrightColor: false
+          });
+        }
+      },
+      animate(html3d, panel) {
+        panel.localData.lastAnimateCount++;
+        if (panel.localData.lastAnimateCount >= panel.userData.animateIntervalCount) {
+          panel.localData.lastAnimateCount = 0;
+          const ctx = panel.localData.ctx;
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+          ctx.fillRect(0, 0, panel.localData.canvas.width, panel.localData.canvas.height);
+          ctx.fillStyle = '#00ff00';
+          ctx.font = panel.userData.fontSize + 'px monospace';
+          for (let i = 0; i < panel.localData.drops.length; i++) {
+            const character = panel.userData.characters[Math.floor(Math.random() * panel.userData.characters.length)];
+            const x = i * panel.userData.fontSize;
+            const y = (panel.localData.drops[i].rowIndex * panel.userData.fontSize);
+            const brightness = (Math.random() * 0.5) + 0.5;
+            if (panel.localData.drops[i].onceBrightColor === true) {
+              ctx.fillStyle = `rgba(${Math.floor(255 * brightness)}, ${Math.floor(255 * brightness)}, ${Math.floor(255 * brightness)}, ${brightness})`;
+              panel.localData.drops[i].onceBrightColor = undefined;
+            } else {
+              ctx.fillStyle = `rgba(0, ${Math.floor(255 * brightness)}, 0, ${brightness})`;
+            }
+            ctx.fillText(character, x, y);
+            if ((y > panel.localData.canvas.height) || (Math.random() > 0.98)) {
+              panel.localData.drops[i].rowIndex = 0;
+            }
+            if (panel.localData.drops[i].rowIndex === 0) {
+              if (Math.random() < 0.05) {
+                panel.localData.drops[i].rowIndex = 1;
+              }
+            } else if (Math.random() < 0.80) {
+              panel.localData.drops[i].rowIndex++;
+            } else {
+              panel.localData.drops[i].onceBrightColor = true;
+            }
+          }
+        }
+      }
+    },
+    {
+      id: 'fire',
+      width: (1800 - 20),
+      height: 1000,
+      x: (buildingWidth / 4) - ((1800 - 20) / 2),
+      y: ((-(wallHeight + floorDepth)) - ((wallHeight / 2) + 500)),
+      z: (-buildingDepth / 2) + 110,
+      rotationX: 0,
+      rotationY: 0,
+      obstruction: false,
+      interaction: false,
+      backgroundColor: 'transparent',
+      opacity: 1,
+      userData: {
+        pixelSize: 10,
+        darkBackground: true,
+        showPixels: false,
+        animateIntervalCount: 4
+      },
+      init(html3d, panel) {
+        panel.localData = {};
+        panel.localData.canvas = document.createElement('canvas');
+        panel.localData.canvas.setAttribute('width', ((1800 - 20) / panel.userData.pixelSize) | 0);
+        panel.localData.canvas.setAttribute('height', (1000 / panel.userData.pixelSize) | 0);
+        Object.assign(panel.localData.canvas.style, {
+          display: 'block',
+          position: 'absolute',
+          left: '0px',
+          top: '0px',
+          width: `${(1800 - 20)}px`,
+          height: `${1000}px`
+        });
+        if (panel.userData.showPixels === true) {
+          panel.localData.canvas.style.imageRendering = 'pixelated';
+          panel.localData.canvas.style.imageRendering = 'crisp-edges';
+        }
+        panel.element.appendChild(panel.localData.canvas);
+        panel.localData.ctx = panel.localData.canvas.getContext('2d');
+        Object.assign(panel.localData, {
+          width: panel.localData.canvas.width,
+          height: panel.localData.canvas.height,
+          lastAnimateCount: 0,
+          visible: true,
+          firePixels: null,
+          paletteRgb: (panel.userData.darkBackground ?
+            [
+              // pallet for black background
+              '#070707', '#1F0707', '#2F0F07', '#470F07', '#571707',
+              '#671F07', '#771F07', '#8F2707', '#9F2F07', '#AF3F07',
+              '#BF4707', '#C74707', '#DF4F07', '#DF5707', '#DF5707',
+              '#D75F07', '#D7670F', '#CF6F0F', '#CF770F', '#CF7F0F',
+              '#CF8717', '#C78717', '#C78F17', '#C7971F', '#BF9F1F',
+              '#BF9F1F', '#BFA727', '#BFA727', '#BFAF2F', '#B7AF2F',
+              '#B7B72F', '#B7B737', '#CFCF6F', '#DFDF9F', '#EFEFC7',
+              '#FFFFFF'
+            ] : [
+              // palette for white background
+              '#000000', '#FFF9E8', '#FFF0CC', '#FFE6B0', '#FFDB94', 
+              '#FFD078', '#FFC55C', '#FFB940', '#FFAD24', '#FFA108', 
+              '#FF9400', '#FF8600', '#F87A00', '#F06E00', '#E86100', 
+              '#E05400', '#D84800', '#D03C00', '#C82F00', '#C02300', 
+              '#B81700', '#B00B00', '#A90000', '#A00000', '#970000', 
+              '#8E0000', '#850000', '#7C0000', '#730000', '#6A0000', 
+              '#610000', '#580000', '#4F0000', '#460000', '#4F0000', 
+              '#580000','#610000', '#6A0000', '#730000', '#7C0000', 
+              '#850000', '#8E0000'
+            ]).map(color => {
+              const x = parseInt(color.slice(1), 16);
+              return { r: (x >> 16) & 255, g: (x >> 8) & 255, b: x & 255 };
+            }
+          ),
+          image: null
+        });
+        panel.localData.firePixels = new Uint8Array(panel.localData.width * panel.localData.height);
+        panel.localData.firePixels.fill(panel.localData.paletteRgb.length - 1);
+        panel.localData.image = panel.localData.ctx.createImageData(panel.localData.width, panel.localData.height);
+      },
+      animate(html3d, panel) {
+        if (panel.localData.visible) {
+          panel.localData.lastAnimateCount++;
+          if (panel.localData.lastAnimateCount >= panel.userData.animateIntervalCount) {
+            panel.localData.lastAnimateCount = 0;
+            const ctx = panel.localData.ctx;
+            for (let y = 0; y < panel.localData.height - 1; y++) {
+              const yw = y * panel.localData.width;
+              const belowYW = (y + 1) * panel.localData.width;
+              for (let x = 0; x < panel.localData.width; x++) {
+                const decay = Math.random() * 3 | 0;
+                const dstX = (x + (Math.random() * 3 | 0) - 1 + panel.localData.width) % panel.localData.width;
+                const dst = yw + dstX;
+                const heat = Math.max(panel.localData.firePixels[belowYW + x] - decay, 0);
+                panel.localData.firePixels[dst] = heat;
+              }
+            }
+            const data = panel.localData.image.data;
+            let p = 0;
+            for (let i = 0, c = panel.localData.firePixels.length; i < c; i++) {
+              if (panel.localData.firePixels[i] === 0) {
+                data[p++] = 0;
+                data[p++] = 0;
+                data[p++] = 0;
+                data[p++] = 0;
+              } else {
+                const { r, g, b } = panel.localData.paletteRgb[panel.localData.firePixels[i]];
+                data[p++] = r;
+                data[p++] = g;
+                data[p++] = b;
+                data[p++] = 255;
+              }
+            }
+            ctx.putImageData(panel.localData.image, 0, 0);
+          }
+        }
+      }
+    },
+    {
+      id: 'video',
       width: 1800,
       height: 1000,
       x: (buildingWidth / 4) - 900,
@@ -2749,7 +2966,7 @@ const SCENE = {
       }
     },
     {
-      id: 'firstFloorYouTubeVideoControls',
+      id: 'videoControls',
       width: 160,
       height: 160,
       x: (buildingWidth / 4) + 900 + 40,
@@ -2761,109 +2978,36 @@ const SCENE = {
       interaction: true,
       backgroundColor: '#444444',
       innerHTML: `
-        <div id="firstFloorYouTubeVideoControls_onOffButton" title="Watch a YouTube video.\n\nWhen switching on, the video will not play automatically, you need to press play.\nAfter pressing play, click outside the video to regain keyboard movement control." style="position: absolute; left: 35px; top: 35px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; box-shadow: 0 0 15px #FFDF00;">
+        <div id="videoControls_onOffButton" title="Watch a YouTube video.\n\nWhen switching on, the video will not play automatically, you need to press play.\nAfter pressing play, click outside the video to regain keyboard movement control." style="position: absolute; left: 35px; top: 35px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; box-shadow: 0 0 15px #FFDF00;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 15px; top: 15px; width: 50px; height: 50px;" fill="#ffffff" stroke="none">
             <path d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"></path>
           </svg>
         </div>
       `,
       click(html3d, panel) {
-        const firstFloorYouTubeVideo = html3d.panels.find((so) => so.id === 'firstFloorYouTubeVideo');
-        const onOffButton = document.getElementById('firstFloorYouTubeVideoControls_onOffButton');
-        if (firstFloorYouTubeVideo.userData.isOn === false) {
-          firstFloorYouTubeVideo.iframe.src = 'https://www.youtube.com/embed/BiQXFKYa-co?autoplay=0&mute=0&controls=1&loop=0';
-          firstFloorYouTubeVideo.element.style.pointerEvents = 'auto';
-          firstFloorYouTubeVideo.element.style.userSelect = 'auto';
-          firstFloorYouTubeVideo.userData.isOn = true;
+        const video = html3d.panels.find((so) => so.id === 'video');
+        const fire = html3d.panels.find((so) => so.id === 'fire');
+        const onOffButton = document.getElementById('videoControls_onOffButton');
+        if (video.userData.isOn === false) {
+          video.iframe.src = 'https://www.youtube.com/embed/BiQXFKYa-co?autoplay=0&mute=0&controls=1&loop=0';
+          video.element.style.pointerEvents = 'auto';
+          video.element.style.userSelect = 'auto';
+          video.userData.isOn = true;
           onOffButton.style.border = '5px solid #55F755';
           onOffButton.style.boxShadow = '0 0 15px #00F700';
           onOffButton.style.textShadow = '0 0 8px #55F755';
+          fire.element.style.visibility = 'hidden';
+          fire.localData.visible = false;
         } else {
-          firstFloorYouTubeVideo.iframe.src = '';
-          firstFloorYouTubeVideo.element.style.pointerEvents = 'none';
-          firstFloorYouTubeVideo.element.style.userSelect = 'none';
-          firstFloorYouTubeVideo.userData.isOn = false;
+          video.iframe.src = '';
+          video.element.style.pointerEvents = 'none';
+          video.element.style.userSelect = 'none';
+          video.userData.isOn = false;
           onOffButton.style.border = '5px solid #FFDF00';
           onOffButton.style.boxShadow = '0 0 15px #F77C00';
           onOffButton.style.textShadow = '0 0 8px #F77C00';
-        }
-      }
-    },
-    {
-      id: 'firstFloorWall',
-      width: (buildingDepth - 2500),
-      height: wallHeight,
-      x: 0,
-      y: (-(wallHeight + floorDepth + wallHeight)),
-      z: -(buildingDepth / 2),
-      rotationX: 0,
-      rotationY: -(Math.PI / 2),
-      obstruction: true,
-      interaction: true,
-      backgroundColor: '#F4F4F4'
-    },
-    {
-      id: 'digitalRain',
-      width: 2500,
-      height: wallHeight,
-      x: 0,
-      y: (-(wallHeight + floorDepth + wallHeight)),
-      z: (buildingDepth / 2) - 2500,
-      rotationX: 0,
-      rotationY: -(Math.PI / 2),
-      obstruction: false,
-      interaction: false,
-      backgroundColor: '#000000',
-      opacity: 0.6,
-      innerHTML: `
-        <canvas id="digitalRain_canvas" width="${(2500/3)|0}" height="${(wallHeight/3)|0}" style="display: block; position: absolute; left: 0px; top: 0px; width: ${2500}px; height: ${wallHeight}px;"></canvas>
-      `,
-      userData: {
-        canvas: null,
-        ctx: null,
-        fontSize: 16,
-        characters: 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
-        drops: [],
-        lastAnimateCount: 0,
-        animateIntervalCount: 12
-      },
-      init(html3d, panel) {
-        panel.userData.canvas = document.getElementById('digitalRain_canvas');
-        panel.userData.ctx = panel.userData.canvas.getContext('2d');
-        const columns = Math.floor(panel.userData.canvas.width / panel.userData.fontSize);
-        panel.userData.drops = [];
-        for (let i = 0; i < columns; i++) {
-          panel.userData.drops[i] = ((Math.random() * panel.userData.canvas.height) / panel.userData.fontSize) | 0;
-        }
-        panel.userData.lastAnimateCount = 0;
-      },
-      animate(html3d, panel) {
-        panel.userData.lastAnimateCount++;
-        if (panel.userData.lastAnimateCount >= panel.userData.animateIntervalCount) {
-          panel.userData.lastAnimateCount = 0;
-          const ctx = panel.userData.ctx;
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-          ctx.fillRect(0, 0, panel.userData.canvas.width, panel.userData.canvas.height);
-          ctx.fillStyle = '#00ff00';
-          ctx.font = panel.userData.fontSize + 'px monospace';
-          for (let i = 0; i < panel.userData.drops.length; i++) {
-            const character = panel.userData.characters[Math.floor(Math.random() * panel.userData.characters.length)];
-            const x = i * panel.userData.fontSize;
-            const y = (panel.userData.drops[i] * panel.userData.fontSize); // + panel.userData.fontSize;
-            const brightness = (Math.random() * 0.5) + 0.5;
-            ctx.fillStyle = `rgba(0, ${Math.floor(255 * brightness)}, 0, ${brightness})`;
-            ctx.fillText(character, x, y);
-            if ((y > panel.userData.canvas.height) || (Math.random() > 0.98)) {
-              panel.userData.drops[i] = 0;
-            }
-            if (panel.userData.drops[i] === 0) {
-              if (Math.random() < 0.05) {
-                panel.userData.drops[i] = 1;
-              }
-            } else if (Math.random() < 0.85) {
-              panel.userData.drops[i]++;
-            }
-          }
+          fire.element.style.visibility = 'visible';
+          fire.localData.visible = true;
         }
       }
     }
