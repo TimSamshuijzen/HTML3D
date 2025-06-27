@@ -2744,7 +2744,7 @@ const SCENE = {
         fontSize: 16,
         characters: 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
         animateIntervalCount: 12,
-        showPixels: false
+        pixelated: false
       },
       init(html3d, panel) {
         panel.localData = {};
@@ -2759,7 +2759,7 @@ const SCENE = {
           width: `${(2500 - 200)}px`,
           height: `${wallHeight}px`
         });
-        if (panel.userData.showPixels === true) {
+        if (panel.userData.pixelated === true) {
           panel.localData.canvas.style.imageRendering = 'pixelated';
           panel.localData.canvas.style.imageRendering = 'crisp-edges';
         }
@@ -2775,7 +2775,7 @@ const SCENE = {
         for (let i = 0; i < columns; i++) {
           panel.localData.drops.push({
             rowIndex: ((Math.random() * panel.localData.canvas.height) / panel.userData.fontSize) | 0,
-            onceBrightColor: false
+            nextHighlight: false
           });
         }
       },
@@ -2788,16 +2788,17 @@ const SCENE = {
           ctx.fillRect(0, 0, panel.localData.canvas.width, panel.localData.canvas.height);
           ctx.fillStyle = '#00ff00';
           ctx.font = panel.userData.fontSize + 'px monospace';
-          for (let i = 0; i < panel.localData.drops.length; i++) {
+          for (let i = 0, c = panel.localData.drops.length; i < c; i++) {
             const character = panel.userData.characters[Math.floor(Math.random() * panel.userData.characters.length)];
             const x = i * panel.userData.fontSize;
             const y = (panel.localData.drops[i].rowIndex * panel.userData.fontSize);
             const brightness = (Math.random() * 0.5) + 0.5;
-            if (panel.localData.drops[i].onceBrightColor === true) {
-              ctx.fillStyle = `rgba(${Math.floor(255 * brightness)}, ${Math.floor(255 * brightness)}, ${Math.floor(255 * brightness)}, ${brightness})`;
-              panel.localData.drops[i].onceBrightColor = undefined;
+            const brightness255 = Math.floor(255 * brightness);
+            if (panel.localData.drops[i].nextHighlight === true) {
+              ctx.fillStyle = `rgba(${brightness255}, ${brightness255}, ${brightness255}, ${brightness})`;
+              panel.localData.drops[i].nextHighlight = false;
             } else {
-              ctx.fillStyle = `rgba(0, ${Math.floor(255 * brightness)}, 0, ${brightness})`;
+              ctx.fillStyle = `rgba(0, ${brightness255}, 0, ${brightness})`;
             }
             ctx.fillText(character, x, y);
             if ((y > panel.localData.canvas.height) || (Math.random() > 0.98)) {
@@ -2810,7 +2811,7 @@ const SCENE = {
             } else if (Math.random() < 0.80) {
               panel.localData.drops[i].rowIndex++;
             } else {
-              panel.localData.drops[i].onceBrightColor = true;
+              panel.localData.drops[i].nextHighlight = true;
             }
           }
         }
@@ -2832,7 +2833,7 @@ const SCENE = {
       userData: {
         pixelSize: 10,
         darkBackground: true,
-        showPixels: false,
+        pixelated: false,
         animateIntervalCount: 4
       },
       init(html3d, panel) {
@@ -2848,7 +2849,7 @@ const SCENE = {
           width: `${(1800 - 20)}px`,
           height: `${1000}px`
         });
-        if (panel.userData.showPixels === true) {
+        if (panel.userData.pixelated === true) {
           panel.localData.canvas.style.imageRendering = 'pixelated';
           panel.localData.canvas.style.imageRendering = 'crisp-edges';
         }
@@ -2894,39 +2895,39 @@ const SCENE = {
         panel.localData.image = panel.localData.ctx.createImageData(panel.localData.width, panel.localData.height);
       },
       animate(html3d, panel) {
-        if (panel.localData.visible) {
-          panel.localData.lastAnimateCount++;
-          if (panel.localData.lastAnimateCount >= panel.userData.animateIntervalCount) {
-            panel.localData.lastAnimateCount = 0;
-            const ctx = panel.localData.ctx;
-            for (let y = 0; y < panel.localData.height - 1; y++) {
-              const yw = y * panel.localData.width;
-              const belowYW = (y + 1) * panel.localData.width;
-              for (let x = 0; x < panel.localData.width; x++) {
+        const localData = panel.localData;
+        if (localData.visible) {
+          localData.lastAnimateCount++;
+          if (localData.lastAnimateCount >= panel.userData.animateIntervalCount) {
+            localData.lastAnimateCount = 0;
+            for (let y = 0, yc = localData.height - 1; y < yc; y++) {
+              const yw = y * localData.width;
+              const belowYW = (y + 1) * localData.width;
+              for (let x = 0, xc = localData.width; x < xc; x++) {
                 const decay = Math.random() * 3 | 0;
-                const dstX = (x + (Math.random() * 3 | 0) - 1 + panel.localData.width) % panel.localData.width;
+                const dstX = (x + (Math.random() * 3 | 0) - 1 + xc) % xc;
                 const dst = yw + dstX;
-                const heat = Math.max(panel.localData.firePixels[belowYW + x] - decay, 0);
-                panel.localData.firePixels[dst] = heat;
+                const heat = Math.max(localData.firePixels[belowYW + x] - decay, 0);
+                localData.firePixels[dst] = heat;
               }
             }
-            const data = panel.localData.image.data;
+            const data = localData.image.data;
             let p = 0;
-            for (let i = 0, c = panel.localData.firePixels.length; i < c; i++) {
-              if (panel.localData.firePixels[i] === 0) {
+            for (let i = 0, c = localData.firePixels.length; i < c; i++) {
+              if (localData.firePixels[i] === 0) {
                 data[p++] = 0;
                 data[p++] = 0;
                 data[p++] = 0;
                 data[p++] = 0;
               } else {
-                const { r, g, b } = panel.localData.paletteRgb[panel.localData.firePixels[i]];
+                const { r, g, b } = localData.paletteRgb[localData.firePixels[i]];
                 data[p++] = r;
                 data[p++] = g;
                 data[p++] = b;
                 data[p++] = 255;
               }
             }
-            ctx.putImageData(panel.localData.image, 0, 0);
+            localData.ctx.putImageData(localData.image, 0, 0);
           }
         }
       }
