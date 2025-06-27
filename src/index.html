@@ -2780,38 +2780,39 @@ const SCENE = {
         }
       },
       animate(html3d, panel) {
-        panel.localData.lastAnimateCount++;
-        if (panel.localData.lastAnimateCount >= panel.userData.animateIntervalCount) {
-          panel.localData.lastAnimateCount = 0;
-          const ctx = panel.localData.ctx;
+        const localData = panel.localData;
+        localData.lastAnimateCount++;
+        if (localData.lastAnimateCount >= panel.userData.animateIntervalCount) {
+          localData.lastAnimateCount = 0;
+          const ctx = localData.ctx;
           ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-          ctx.fillRect(0, 0, panel.localData.canvas.width, panel.localData.canvas.height);
+          ctx.fillRect(0, 0, localData.canvas.width, localData.canvas.height);
           ctx.fillStyle = '#00ff00';
           ctx.font = panel.userData.fontSize + 'px monospace';
-          for (let i = 0, c = panel.localData.drops.length; i < c; i++) {
+          for (let i = 0, c = localData.drops.length; i < c; i++) {
             const character = panel.userData.characters[Math.floor(Math.random() * panel.userData.characters.length)];
             const x = i * panel.userData.fontSize;
-            const y = (panel.localData.drops[i].rowIndex * panel.userData.fontSize);
+            const y = (localData.drops[i].rowIndex * panel.userData.fontSize);
             const brightness = (Math.random() * 0.5) + 0.5;
             const brightness255 = Math.floor(255 * brightness);
-            if (panel.localData.drops[i].nextHighlight === true) {
+            if (localData.drops[i].nextHighlight === true) {
               ctx.fillStyle = `rgba(${brightness255}, ${brightness255}, ${brightness255}, ${brightness})`;
-              panel.localData.drops[i].nextHighlight = false;
+              localData.drops[i].nextHighlight = false;
             } else {
               ctx.fillStyle = `rgba(0, ${brightness255}, 0, ${brightness})`;
             }
             ctx.fillText(character, x, y);
-            if ((y > panel.localData.canvas.height) || (Math.random() > 0.98)) {
-              panel.localData.drops[i].rowIndex = 0;
+            if ((y > localData.canvas.height) || (Math.random() > 0.98)) {
+              localData.drops[i].rowIndex = 0;
             }
-            if (panel.localData.drops[i].rowIndex === 0) {
+            if (localData.drops[i].rowIndex === 0) {
               if (Math.random() < 0.05) {
-                panel.localData.drops[i].rowIndex = 1;
+                localData.drops[i].rowIndex = 1;
               }
             } else if (Math.random() < 0.80) {
-              panel.localData.drops[i].rowIndex++;
+              localData.drops[i].rowIndex++;
             } else {
-              panel.localData.drops[i].nextHighlight = true;
+              localData.drops[i].nextHighlight = true;
             }
           }
         }
@@ -2834,7 +2835,7 @@ const SCENE = {
         pixelSize: 10,
         darkBackground: true,
         pixelated: false,
-        animateIntervalCount: 4
+        animateIntervalCount: 3
       },
       init(html3d, panel) {
         panel.localData = {};
