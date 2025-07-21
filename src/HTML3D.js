@@ -16,9 +16,38 @@ class HTML3D {
         this.worldMatrix.setTranslate(this.x, this.y, this.z);
         this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateY(this.rotationY));
         this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateX(this.rotationX));
-      }
+      },
+      userData: ((typeof scene?.camera?.userData === 'object') ? scene.camera.userData : null),
+      init: null,
+      animate: null
     };
+    if (typeof scene?.camera?.init === 'function') {
+      this.camera.init = scene.camera.init;
+    } else if (typeof scene?.camera?.initString === 'string') {
+      try {
+        this.camera.init = new Function('html3d', 'camera', scene.camera.initString);
+      } catch (e) {
+        this.camera.init = null;
+        console.error(e);
+      }
+    } else {
+      this.camera.init = null;
+    }
+    if (this.camera.init !== null) {
+      this.camera.init(this, this.camera);
+    }
     this.camera.updateWorldMatrix();
+    this.camera.animate = null;
+    if (typeof scene?.camera?.animate === 'function') {
+      this.camera.animate = scene.camera.animate;
+    } else if (typeof scene?.camera?.animateString === 'string') {
+      try {
+        this.camera.animate = new Function('html3d', 'camera', scene.camera.animateString);
+      } catch (e) {
+        this.camera.animate = null;
+        console.error(e);
+      }
+    }
     this.container = container;
     this.cameraContainer = document.createElement('div');
     Object.assign(this.cameraContainer.style, {
@@ -43,46 +72,17 @@ class HTML3D {
         this.panels.push(panel);
       }
     }
+    this.requestRender = true;
     for (const panel of this.panels) {
       if (panel.init !== null) {
         panel.init(this, panel);
       }
     }
-    this.requestRender = true;
-    this.keyboard = {};
-    document.addEventListener('keydown', (event) => {
-      if ((document.activeElement.tagName !== 'TEXTAREA') && (document.activeElement.tagName !== 'INPUT')) {
-        this.keyboard[event.code] = true;
-        // In some rare cases the keyup event is not triggered, so we help the user get out of the stuck keys situation.
-        if (event.code === 'Escape') {
-          this.keyboard = {};
-        } else if ((event.code === 'ArrowLeft') || (event.code === this.keyboard['KeyA'])) {
-          this.keyboard['ArrowRight'] = false;
-          this.keyboard['KeyD'] = false;
-        } else if ((event.code === 'ArrowRight') || (event.code === this.keyboard['KeyD'])) {
-          this.keyboard['ArrowLeft'] = false;
-          this.keyboard['KeyA'] = false;
-        } else if ((event.code === 'ArrowUp') || (event.code === this.keyboard['KeyW'])) {
-          this.keyboard['ArrowDown'] = false;
-          this.keyboard['KeyS'] = false;
-        } else if ((event.code === 'ArrowDown') || (event.code === this.keyboard['KeyS'])) {
-          this.keyboard['ArrowUp'] = false;
-          this.keyboard['KeyW'] = false;
-        } else if (event.code === 'KeyZ') {
-          this.keyboard['KeyX'] = false;
-        } else if (event.code === 'KeyX') {
-          this.keyboard['KeyZ'] = false;
-        }
-      }
-    });
-    document.addEventListener('keyup', (event) => { 
-      this.keyboard[event.code] = false; 
-    });
     window.addEventListener('resize', () => { this.requestRender = true; });
     this._thread();
   }
   export() {
-    return {
+    const result = {
       camera: {
         x: this.camera.x,
         y: this.camera.y,
@@ -91,12 +91,22 @@ class HTML3D {
         rotationY: this.camera.rotationY,
         collisionWidth: this.camera.collisionWidth,
         collisionHeight: this.camera.collisionHeight,
-        fov: this.camera.fov
+        fov: this.camera.fov,
+        userData: (this.camera.userData !== null) ? this.camera.userData : null
       },
       panels: this.panels.map((panel) => {
         return panel.export();
       })
     };
+    if (this.camera.init !== null) {
+      result.camera.initString = this.camera.init.toString();
+      result.camera.initString = result.camera.initString.substring(result.camera.initString.indexOf('{') + 1, result.camera.initString.lastIndexOf('}')).trim();
+    }
+    if (this.camera.animate !== null) {
+      result.camera.animateString = this.camera.animate.toString();
+      result.camera.animateString = result.camera.animateString.substring(result.camera.animateString.indexOf('{') + 1, result.camera.animateString.lastIndexOf('}')).trim();
+    }
+    return result;
   }
   import(scene) {
     for (const panel of this.panels) {
@@ -113,6 +123,30 @@ class HTML3D {
       this.camera.collisionHeight = (scene.camera.collisionHeight !== undefined) ? scene.camera.collisionHeight : 700;
       this.camera.fov = (scene.camera.fov !== undefined) ? scene.camera.fov : 70;
       this.camera.updateWorldMatrix();
+      this.camera.userData = (typeof scene.camera.userData === 'object') ? scene.camera.userData : null;
+      if (typeof scene.camera.init === 'function') {
+        this.camera.init = scene.camera.init;
+      } else if (typeof scene.camera.initString === 'string') {
+        try {
+          this.camera.init = new Function('html3d', 'camera', scene.camera.initString);
+        } catch (e) {
+          this.camera.init = null;
+          console.error(e);
+        }
+      } else {
+        this.camera.init = null;
+      }
+      this.camera.animate = null;
+      if (typeof scene.camera.animate === 'function') {
+        this.camera.animate = scene.camera.animate;
+      } else if (typeof scene.camera.animateString === 'string') {
+        try {
+          this.camera.animate = new Function('html3d', 'camera', scene.camera.animateString);
+        } catch (e) {
+          this.camera.animate = null;
+          console.error(e);
+        }
+      }
     }
     if (Array.isArray(scene?.panels)) {
       for (const panelData of scene.panels) {
@@ -123,6 +157,10 @@ class HTML3D {
       if (panel.init !== null) {
         panel.init(this, panel);
       }
+    }
+    if (this.camera.init !== null) {
+      this.camera.init(this, this.camera);
+      this.camera.updateWorldMatrix();
     }
     this.requestRender = true;
   }
@@ -137,8 +175,8 @@ class HTML3D {
     }
   }
   _thread() {
-    if (this._moveCamera()) {
-      this.requestRender = true;
+    if (this.camera.animate !== null) {
+      this.camera.animate(this, this.camera);
     }
     if (this.requestRender) {
       this.requestRender = false;
@@ -152,63 +190,7 @@ class HTML3D {
     }
     requestAnimationFrame(() => this._thread());
   }
-  _moveCamera() {
-    let result = false;
-    const moveSpeed = 2500 * (1 / 60);
-    const rotateSpeed = (Math.PI * 0.5) * (1 / 60);
-    const forward = new HTML3D.Vector3(0, 0, -1);
-    forward.applyMatrix4Rotation(this.camera.worldMatrix);
-    forward.y = 0;
-    forward.normalize();
-    const right = new HTML3D.Vector3(this.camera.worldMatrix.elements[0], this.camera.worldMatrix.elements[1], this.camera.worldMatrix.elements[2]);
-    right.y = 0;
-    right.normalize();
-    if ((this.keyboard['ArrowLeft']) || (this.keyboard['KeyA'])) {
-      this.camera.rotationY += rotateSpeed;
-      result = true;
-    }
-    if ((this.keyboard['ArrowRight']) || (this.keyboard['KeyD'])) {
-      this.camera.rotationY -= rotateSpeed;
-      result = true;
-    }
-    const intendedMove = new HTML3D.Vector3(0, 0, 0);
-    if ((this.keyboard['ArrowUp']) || (this.keyboard['KeyW'])) {
-      intendedMove.add(forward);
-    }
-    if ((this.keyboard['ArrowDown']) || (this.keyboard['KeyS'])) {
-      intendedMove.sub(forward);
-    }
-    if (this.keyboard['KeyZ']) { 
-      intendedMove.sub(right); 
-    }
-    if (this.keyboard['KeyX']) { 
-      intendedMove.add(right);
-    }
-    if (intendedMove.lengthSq() > 0) {
-      intendedMove.normalize();
-      intendedMove.multiplyScalar(moveSpeed);
-      const finalMove = intendedMove.clone();
-      const moveX = new HTML3D.Vector3(intendedMove.x, 0, 0);
-      if (this._checkAABBCollision(moveX)) {
-        finalMove.x = 0;
-      }
-      const moveZ = new HTML3D.Vector3(0, 0, intendedMove.z);
-      if (this._checkAABBCollision(moveZ)) {
-        finalMove.z = 0;
-      }
-      if (finalMove.lengthSq() > 0) {
-        result = true;
-        this.camera.x += finalMove.x;
-        this.camera.y += finalMove.y;
-        this.camera.z += finalMove.z;
-      }
-    }
-    if (result) {
-      this.camera.updateWorldMatrix();
-    }
-    return result;
-  }
-  _checkAABBCollision(moveDirection) {
+  checkAABBCollision(moveDirection) {
     const targetPosition = new HTML3D.Vector3(this.camera.x, this.camera.y, this.camera.z);
     targetPosition.add(moveDirection);
     const halfCameraWidth = (this.camera.collisionWidth / 2);
@@ -253,25 +235,31 @@ class HTML3D {
         iframeSrc: ((typeof scenePanel.iframeSrc === 'string') ? scenePanel.iframeSrc : null),
         iframeHtml: ((typeof scenePanel.iframeHtml === 'string') ? scenePanel.iframeHtml : null),
         userData: ((typeof scenePanel.userData === 'object') ? scenePanel.userData : null),
-        init: ((typeof scenePanel.init === 'function') ? scenePanel.init : null),
-        click: ((typeof scenePanel.click === 'function') ? scenePanel.click : null),
-        animate: ((typeof scenePanel.animate === 'function') ? scenePanel.animate : null)
+        init: null,
+        click: null,
+        animate: null
       });
-      if (typeof scenePanel.initString === 'string') {
+      if (typeof scenePanel.init === 'function') {
+        this.init = scenePanel.init;
+      } else if (typeof scenePanel.initString === 'string') {
         try {
           this.init = new Function('html3d', 'panel', scenePanel.initString);
         } catch (e) {
           this.init = null;
         }
       }
-      if (typeof scenePanel.clickString === 'string') {
+      if (typeof scenePanel.click === 'function') {
+        this.click = scenePanel.click;
+      } else if (typeof scenePanel.clickString === 'string') {
         try {
           this.click = new Function('html3d', 'panel', scenePanel.clickString);
         } catch (e) {
           this.click = null;
         }
       }
-      if (typeof scenePanel.animateString === 'string') {
+      if (typeof scenePanel.animate === 'function') {
+        this.animate = scenePanel.animate;
+      } else if (typeof scenePanel.animateString === 'string') {
         try { 
           this.animate = new Function('html3d', 'panel', scenePanel.animateString);
         } catch (e) {
@@ -298,9 +286,9 @@ class HTML3D {
       if (this.innerHTML !== null) {
         this.element.innerHTML = this.innerHTML;
       } else if ((this.iframeSrc !== null) || (this.iframeHtml !== null)) {
-        this.element.style.width = (this.width - 6) + 'px';
-        this.element.style.height = (this.height - 6) + 'px';
-        this.element.style.border = '3px solid ' + this.backgroundColor;
+        this.element.style.width = (this.width - 10) + 'px';
+        this.element.style.height = (this.height - 10) + 'px';
+        this.element.style.border = '5px solid ' + this.backgroundColor;
         this.iframe = document.createElement('iframe');
         this.iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
         if (this.iframeSrc !== null) {
@@ -312,8 +300,8 @@ class HTML3D {
           position: 'absolute',
           left: '0px',
           top: '0px',
-          width: (this.width - 6) + 'px',
-          height: (this.height - 6) + 'px',
+          width: (this.width - 10) + 'px',
+          height: (this.height - 10) + 'px',
           border: 'none'
         });
         this.element.appendChild(this.iframe);
@@ -363,7 +351,7 @@ class HTML3D {
         iframeSrc: (this.iframeSrc !== null) ? this.iframeSrc : undefined,
         iframeHtml: (this.iframeHtml !== null) ? this.iframeHtml : undefined
       };
-      if (this.userData !== null) {
+      if ((typeof this.userData === 'object') && (this.userData !== null)) {
         panelData.userData = {};
         for (const key in this.userData) {
           if (this.userData.hasOwnProperty(key)) {
@@ -371,15 +359,15 @@ class HTML3D {
           }
         }
       }
-      if (this.init !== null) {
+      if (typeof this.init === 'function') {
         panelData.initString = this.init.toString();
         panelData.initString = panelData.initString.substring(panelData.initString.indexOf('{') + 1, panelData.initString.lastIndexOf('}')).trim();
       }
-      if (this.click !== null) {
+      if (typeof this.click === 'function') {
         panelData.clickString = this.click.toString();
         panelData.clickString = panelData.clickString.substring(panelData.clickString.indexOf('{') + 1, panelData.clickString.lastIndexOf('}')).trim();
       }
-      if (this.animate !== null) {
+      if (typeof this.animate === 'function') {
         panelData.animateString = this.animate.toString();
         panelData.animateString = panelData.animateString.substring(panelData.animateString.indexOf('{') + 1, panelData.animateString.lastIndexOf('}')).trim();
       }
@@ -639,4 +627,3 @@ class HTML3D {
     }
   }
 }
-
