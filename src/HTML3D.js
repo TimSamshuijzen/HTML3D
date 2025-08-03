@@ -92,7 +92,7 @@ class HTML3D {
         collisionWidth: this.camera.collisionWidth,
         collisionHeight: this.camera.collisionHeight,
         fov: this.camera.fov,
-        userData: (this.camera.userData !== null) ? this.camera.userData : null
+        userData: (this.camera.userData !== null) ? {...this.camera.userData} : null
       },
       panels: this.panels.map((panel) => {
         return panel.export();
@@ -255,6 +255,7 @@ class HTML3D {
           this.click = new Function('html3d', 'panel', scenePanel.clickString);
         } catch (e) {
           this.click = null;
+          console.error(e);
         }
       }
       if (typeof scenePanel.animate === 'function') {
@@ -264,6 +265,7 @@ class HTML3D {
           this.animate = new Function('html3d', 'panel', scenePanel.animateString);
         } catch (e) {
           this.animate = null;
+          console.error(e);
         }
       }
       this.iframe = null;
@@ -352,12 +354,7 @@ class HTML3D {
         iframeHtml: (this.iframeHtml !== null) ? this.iframeHtml : undefined
       };
       if ((typeof this.userData === 'object') && (this.userData !== null)) {
-        panelData.userData = {};
-        for (const key in this.userData) {
-          if (this.userData.hasOwnProperty(key)) {
-            panelData.userData[key] = this.userData[key];
-          }
-        }
+        panelData.userData = {...this.userData};
       }
       if (typeof this.init === 'function') {
         panelData.initString = this.init.toString();
