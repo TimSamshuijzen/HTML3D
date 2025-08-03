@@ -675,7 +675,7 @@ class HTML3D {
 // AUDIO
 
 const AUDIO = {
-  mainVolume: 1.0,
+  mainVolume: 0.5,
   init() {
     this.enabled = true;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -693,9 +693,9 @@ const AUDIO = {
       teleportIntoGame: new Audio('data:audio/mpeg;base64,/+NIxAAAAAAAAAAAAFhpbmcAAAAPAAAAEQAADPAAGBgYGBgwMDAwMDA8PDw8PDxPT09PT09bW1tbW1tnZ2dnZ2dzc3Nzc3OAgICAgICMjIyMjJiYmJiYmKSkpKSkpLCwsLCwsMPDw8PDw8/Pz8/Pz9vb29vb2/Pz8/Pz8///////AAAAPExBTUUzLjEwMAQoAAAAAAAAAAAVCCQCdCEAAcwAAAzw0SvkUw' + 'A'.repeat(158) + '/+NIxAASCAb9v0EAAFCnbJtvuAAOCDoIS4Pg4CAIAB0Hwf6wfD//B8/pB8HwffKAg7lDn/KAgc6gQdLg+D5oEAx/9YPg//iAEATB8H////lzQIAgCCo0YIAyGGySVSKSRs04ZOWRmFCkVMINg0QFKpg0BCcGV6A9TV13xUHMfIN4HOwSOBAlTzvqkG0BN9Ccpg1GdT/bGsKsKuBWM4wVJJi2IY7MVRkc30wICPIlw1IDMswI7KJshhuCAZiSi6BvkwJUSLwkPVRJk+TkhaWJgTMt8xblOn2dwVjQeZpDAQ0G0WNRxClM2AL9Zjtce3W9zJg0WtDzycUWaCszZ43DxX1OSGqVs8/f0jN8F+cB/qYy7KVQU0zuqzpN9GUCJR6s/+NIxMpEK8Lq+Zp4ACrbp7wr9rNiFEURkywXNajx7N72KyvXN28S7+si3AoyRpKrjDgqz0TclIrW5vFC4UlibgM7qJBL4u0kd65fwo9s+2cyxYM9hGesccdoAAgHVCIBkDaa0B57TKF+IxQhfBVxdNllgsssUfDik2gFDkumhJgXgiZYQrzKRNEcZUFGIY5Q4ZiQQTFw6cwkcqGRjPUiuQUdjI5XPvt/1aiOafK6EVLjSnORyIjOSjEJdSJpr/5e10ZLkHVVFK9EKhFIjXZmY5mVbpKRtKNM9SkJOcrqpFVRUKrz/JkAv7BEGOXuaW7AARIifW0doHIr+oEsTu4srHpoOyeIQeq1O6YbQNPVVUgTMGSWzS+n7t6z97d2b72Z/+MoxMwlO/cJv8koAaJN/1BAvya9Gv28JmAYGRx3i+Tv05b/+P///z50LqUqUIMVNizWWhnD2/3/tmc/mfxj9pJ1S+si4goQl9uKwmhBZ/YSRivz////zTVSbhKwVycmm57qgpmShaV8dktoABIgckR1KXG0ZWHgpMx0jtSHA4CxaIIJAkcSJiZmYIRKZMJd/+M4xLoj9EMSXkmG0Ro4ehqCSc9n+fm+v6htq0XIPLbtcpH6xdPqVAXmYgmfaFdVNcbuv8TVzCzRgdfkKK+UZYxSn+5Eh5ubpxJ/ft731pEyaPP+mFFoTKx6nWn6FnDKxM6Z/5X7znSL0YXZb9QN5WBiSEOV28AAiw0RSKkwIgRGzhSGRJhIdhgPnjFLZCqFlLLmXDzLJCA01ZLHj4YkBQHeFt14a55bRpr3ZQFZccZikeBUgsUQYEFHAnDI+VIiz37/3PWTUlLPz4358iWmyZESKWDGQSgc/+MoxPUjPB8NvjBHYdMzPvwjy/5MvNjK/1RP2nTRxyIrGJseAmUFqYgGeBmSESnUwKFeKAs95BbCCaVuUzswAC0InFpxu+bttGs2YL6deu0yuXk9Dg+2kJmJciQM2xFcGyMtESCCJN4fAzEM9Uz+/8Py3fHIrl23/Nv4a8N6xG4Dopa/yEbZsPbQQcUsJGU3/+MoxOsk68MN3jIGcUSUuHmZX/L+75/qdf2LbUWAmuDeAGiGEiHgknKecRP/8///8oVLZl+PYSzZeZ2q5bixCg1Pz3mpNd5nlLujkkoAFmHlgclIKMmj4dMgBrIkS3WuFEftylKy85OPksenSBF3SSkiswil2tMn0AAq/32cjVWzOEHBBWaOecE5wxoMxgOH/+MoxNoke+cNvkmG7dhVxYlghHUo9lRn539P/7XeFIRmquYQ7EkQkqoc8xVORiDPv3I/+2/p+nNdq3dyOQUrKMUhoVw8k7krM3vLKpiU7655qABAKKU5Lfe0aYdYRy1fYlyZBzVIEXk6ET9OuDDil2prKs72CEdXKZ7N94HuRdxnd+7EtzW0zAdsJCDlki1j/+MoxMshi/sNHjDFCXI4kB5GkIjcnPJ3OZUzxFt/7C/uXVNTatfP1Pydj6mRTOn8LM/IyOOOgJxGkuc7xi2h1u29jlOabPA08mHxaksSX83ZaAA9ePIWeWtqaZGzE6XVYyZfKydfO2W5ZslSYRLVp/Kfkts42Zf0kTP5zoRR+HrEQeBgky4IQx+x9IuShgYM/+MoxMcgo0sVvjBHIEkXxR0JN43W6pVmq6lHWmspz6xmQJzRnBWJjv+/m/85//nDjXQ0X3I2qk9pBTBq2MlhiiFKwQvhcvDK2GOz999+A/076PymqJ4nyaomkJTRSyAAQYhBOz4rEKexNORLRKifrsyugs4uwIimZR6yn+5u4c3hnIHPtd3Ou49GcDeTGMMi/+MoxMcj41MNvmGGdWH6qlu++31t77ISXyo87KJtSQCN7nP0fI34/5FCY0MjH8EUJyQjPGzyu+Wc7/56o3qrEeZw0nW0+504di5G9Yjc/fN3Uk8sRheEQfyH0WFgU9U44ABU0i8G0AUR5sqqppM2jctRY3bN4h1ENtr7Et2bpJUWRUss1sq8A5btma5SMmKn/+MoxLohO8sNvkmGeH1O3DmHSuSYOe1NNs1rTZiO1SmS3IwtOUp5P2TYqTn9Mc6FB5+xk7cyidLWSi4sYCCnFMSBdLU/lU1NySHFB0iAB4SULwARJhDYEHRKtf820rtJaAAJ0KA7sKyB1nrHlwaEmHHFpkqhGM3G3EYZCw2XlJp+2jjV/SOKtmLrsRMI1ohj/+MoxLggoq8NvkmGsLVhE1SoABwmEGDthxt3SCI5FXsI6MUP7f2Ml1XDB0FVaWpDKtdgxxyuioq3rnkhGmeRJI9UPL5ltJwQgQ+ePIW/zPt7+8YtF1/PWs/oLxv7oiCzDVmtobaJR0bcAARJsh7GUQiNGtgUpyKbaE242ITc5xSJw+6pY0mUDJMzaGEe+UNN/+M4xLgjAtMVvjJGiewh6LpYomrNaENvN2CVXK/tertefx277h4yUKkiIUgnw2TrykkSo4KIW10BxRb13/4WkIiX/tP/86Ya0ovM4GeTkdiMitbpy5BBCw4hEr0DlTCyeYWkN8izXaSo739uxStIHns0RLdkbLrJ1WVWngAh0RNhafuGzg4i1VBOVoatdVUcQIjaW3+pS1JXbNwb6UI0PR0rweVEWq8SaghNNjI3nEdK8vprfPFvtY92yuhdHTk/M6gOp5APTmptloD9JuQaCdGp9XJmy4HP/+MoxPclavsJnkpGfYDRZGOk2mHLt7vdUp4NC50rkSxMCDzgdEM46fAgjawFxY8GAiYuY01VlkksZaChSbj4WegHUUg4LFIRSBMZXywylCyJhBta5f905gvKjUzZRVBLEx3SmbjgliVqUG3jdWRQwnMizAgGnHIe6GCaY7UShkDnufxCj1YUUZh9WY04pTPT/+MoxOQiSjcNnUkwABDH4jjhbV4yjhOI/ylUh+FvPdHomyIahXD/skC5PFkvRflwyiuGMnyeq4uQ2D6QbYrnF9g8rspsmIj5lY2K9cIpXQkYSd8iTnouy8RVCXJwdLs5D0QTe5lxSTxmfNiebUzdkdn+twFKrnNuWm9Vtt1XHq+ba1lRCGtSnUqlQKNHqJVI/+NIxN1Dy8LyUZh4AMJc22GpbNs8r5gcFQ6f95HcXj9dPnsKM8ZotVhllRCIXmWFChK5hboTc26jQaSKWKrtqgVI3Eh2uAaqqlAwEuzMzHxmoUBARK6qvGZl2Zm1AW1VVVV/lK6lLmMZkMZ5Sl1KWhgJkMbKUvoY31KWYzfmNQxnqUv//mM1DP/KVpjf////+htDPlL/9DalK/0MZsxnUol4oK6F/BvRdUxBTUUzLjEwMF' + 'V'.repeat(146) + '/+MoxOAaG/baVcMQA' + 'V'.repeat(175))
     };
     this.samples.soundOn.volume = 0.6;
-    this.samples.newGame.volume = 0.35;
-    this.samples.copyIntoGame.volume = 0.35;
-    this.samples.teleportIntoGame.volume = 0.35;
+    this.samples.newGame.volume = 0.2;
+    this.samples.copyIntoGame.volume = 0.2;
+    this.samples.teleportIntoGame.volume = 0.2;
   },
   resumeContext() {
     if (this.audioCtx.state === 'suspended') {
@@ -2585,8 +2585,8 @@ const SCENE = {
       innerHTML: `
         <div style="width: 550px; margin-left: 15px; margin-top: 2px; color: #ffffff; font-size: 20px;" >
           <span style="font-size: 40px;">🛈</span><br />
-          Click on the game screen to give it focus. You can then move about the game scene using your keyboard, by pressing WASD or arrow keys.
-          Click outside the game screen, such as on this text, to resume control of this scene.
+          Click on the game screen to give it focus. You can then move about the game scene using your keyboard.
+          Click outside the game screen, such as on this text, to resume keyboard movement control of this scene.
         </div>
       `,
       init(html3d, panel) {
