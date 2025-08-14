@@ -916,13 +916,14 @@ const SCENE = {
         <div style="position: absolute; left: 100px; top: 750px; width: 1100px; height: 150px; color: #ffffff; font-size: 100px;">
           interact
         </div>
-        <div style="position: absolute; left: 200px; top: 900px; width: 1300px; height: 350px;">
+        <div style="position: absolute; left: 200px; top: 900px; width: 1300px; height: 490px;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 0px; top: 0px; width: 200px; height: 200px;">
             <path fill="#ffffff" d="M11,1.07C7.05,1.56 4,4.92 4,9H11M4,15A8,8 0 0,0 12,23A8,8 0 0,0 20,15V11H4M13,1.07V9H20C20,4.92 16.94,1.56 13,1.07Z" />
           </svg>
-          <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 350px; color: #ffffff; font-size: 42px;">
-            All objects are HTML elements, positioned in 3D space with CSS 3D transforms.
-            You can click on them to interact. When an input field has focus, the keys for moving and turning are disabled.
+          <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 490px; color: #ffffff; font-size: 42px;">
+            All objects are HTML elements, positioned in 3D space with CSS 3D transforms. You can click on them to interact, as you would with any other HTML element.
+            <br />
+            When an input field has focus, the keyboard controls for moving are disabled.
             To resume being able to move with the keyboard, click outside the input field.
           </div>
         </div>
@@ -947,12 +948,12 @@ const SCENE = {
           </div>
         </div>
         <div id="scenejsonTextareaContainer" style="position: absolute; left: 100px; top: 250px; width: 1020px; height: 920px; background-color: transparent; overflow: visible;">
-          <textarea id="scenejsonTextarea" style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #303030; background-color: #ffffff; color: #000000; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
+          <textarea id="scenejsonTextarea" title="This json object describes the entire scene, including camera position and this scene editor." style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #303030; background-color: #ffffff; color: #000000; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
           </textarea>
         </div>
         <div style="position: absolute; left: 1150px; top: 250px; width: 400px; height: 240px; color: #ffffff; font-size: 24px;">
           <span style="font-size: 50px;">🛈</span><br />
-          This json code describes the entire scene, including camera position and this scene editor. You can modify the json code and write it to HTML3D.<br />
+          This json object describes the entire scene, including camera position and this scene editor. You can modify the json object and write it to HTML3D.<br />
         </div>
         <button id="scenejsonReadButton" title="Read current scene state (including camera position) from HTML3D and update the editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
           <span style="display: inline-block; width: 26px; height: 26px;"></span>
