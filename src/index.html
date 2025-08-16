@@ -755,7 +755,7 @@ const SCENE = {
   camera: {
     x: doorWidth / 2,
     y: -cameraHeight,
-    z: 10600,
+    z: 10200,
     rotationX: 0,
     rotationY: 0,
     collisionWidth: 300,
@@ -794,7 +794,7 @@ const SCENE = {
     animate(html3d, camera) {
       let result = false;
       const moveSpeed = 2500 * (1 / 60);
-      const rotateSpeed = (Math.PI * 0.5) * (1 / 60);
+      const rotateSpeed = (Math.PI * 0.5) * (1 / 80);
       const forward = new HTML3D.Vector3(0, 0, -1);
       forward.applyMatrix4Rotation(camera.worldMatrix);
       forward.y = 0;
