@@ -947,44 +947,47 @@ const SCENE = {
             scene editor
           </div>
         </div>
+        <div style="position: absolute; left: 100px; top: 200px; width: 1020px; height: 40px; background-color: transparent; overflow: visible; color: #ffffff; font-size: 32px; line-height: 40px;">
+          scene.json
+        </div>
         <div id="scenejsonTextareaContainer" style="position: absolute; left: 100px; top: 250px; width: 1020px; height: 920px; background-color: transparent; overflow: visible;">
-          <textarea id="scenejsonTextarea" title="This json object describes the entire scene, including camera position and this scene editor." style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #303030; background-color: #ffffff; color: #000000; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
+          <textarea id="scenejsonTextarea" title="scene.json is a description of the entire scene at startup, including camera position and this scene editor." style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #979797; background-color: #222222; color: #C7FFC7; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
           </textarea>
         </div>
-        <div style="position: absolute; left: 1150px; top: 250px; width: 400px; height: 240px; color: #ffffff; font-size: 24px;">
+        <div style="position: absolute; left: 1150px; top: 250px; width: 400px; height: 240px; color: #ffffff; font-size: 21px;">
           <span style="font-size: 50px;">🛈</span><br />
-          This json object describes the entire scene, including camera position and this scene editor. You can modify the json object and write it to HTML3D.<br />
+          scene.json is a description of the entire scene at startup, including camera position and this scene editor. You can modify scene.json and set it as your new scene by clicking "Teleport into scene.json".<br />
         </div>
-        <button id="scenejsonReadButton" title="Read current scene state (including camera position) from HTML3D and update the editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
-          <span style="display: inline-block; width: 26px; height: 26px;"></span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
+        <button id="scenejsonReadButton" title="Copy your scene state into scene.json." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+          <span style="display: inline-block; width: 13px; height: 26px;"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; position: relative; left: 0px; top: 4px; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M13,22L3,12L13,2V8H21V16H13V22M6,12L11,17V14H19V10H11V7L6,12Z"></path>
           </svg>
-          Read scene from HTML3D
+          Update scene.json
         </button>
-        <button id="scenejsonWriteButton" title="Send scene in editor to HTML3D and render the new scene.\nWarning: You will teleport to the set camera position." style="position: absolute; left: 1150px; top: 570px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
-          <span style="display: inline-block; width: 26px; height: 26px;"></span>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
-            <path d="M11,16H3V8H11V2L21,12L11,22V16M13,7V10H5V14H13V17L18,12L13,7Z"></path>
+        <button id="scenejsonWriteButton" title="Teleport into scene.json.\nThe scene described in scene.json will be your new scene." style="position: absolute; left: 1150px; top: 570px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+          <span style="display: inline-block; width: 13px; height: 26px;"></span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; position: relative; left: 0px; top: 4px; width: 26px; height: 26px;" fill="#000000" stroke="none">
+            <path d="M7,11H1V13H7V11M9.17,7.76L7.05,5.64L5.64,7.05L7.76,9.17L9.17,7.76M13,1H11V7H13V1M18.36,7.05L16.95,5.64L14.83,7.76L16.24,9.17L18.36,7.05M17,11V13H23V11H17M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M14.83,16.24L16.95,18.36L18.36,16.95L16.24,14.83L14.83,16.24M5.64,16.95L7.05,18.36L9.17,16.24L7.76,14.83L5.64,16.95M11,23H13V17H11V23Z"></path>
           </svg>
-          Write scene to HTML3D
+          Teleport into scene.json
         </button>
         <button id="scenejsonCopyToClipboardButton" style="position: absolute; left: 1150px; top: 760px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
-          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <span style="display: inline-block; width: 13px; height: 26px;"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path>
           </svg>
-          Copy scene to clipboard
+          Copy scene.json to clipboard
         </button>
         <button id="scenejsonDownloadFileButton" style="position: absolute; left: 1150px; top: 830px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
-          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <span style="display: inline-block; width: 13px; height: 26px;"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"></path>
           </svg>
-          Download scene json file
+          Download scene.json
         </button>
         <button id="scenejsonLoadFromFileButton" style="position: absolute; left: 1150px; top: 900px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
-          <span style="display: inline-block; width: 26px; height: 26px;"></span>
+          <span style="display: inline-block; width: 13px; height: 26px;"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z"></path>
           </svg>
@@ -1093,7 +1096,7 @@ const SCENE = {
           }
         } else if (panel.userData.hasFocus) {
           panel.userData.hasFocus = false;
-          document.getElementById('scenejsonTextarea').style.borderColor = '#303030';
+          document.getElementById('scenejsonTextarea').style.borderColor = '#979797';
         }
       }
     },
