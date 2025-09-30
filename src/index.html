@@ -679,7 +679,7 @@ const AUDIO = {
   init() {
     this.enabled = true;
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    this.audioCtx = new AudioCtx();
+    this.audioCtx = new AudioCtx({ latencyHint: 'interactive' });
     this.audioCtxMainGain = this.audioCtx.createGain();
     this.audioCtxMainGainVolume = AUDIO.mainVolume;
     this.audioCtxMainGain.connect(this.audioCtx.destination);
@@ -702,8 +702,15 @@ const AUDIO = {
       return this.audioCtx.resume();
     }
     return Promise.resolve();
+  },
+  playSample(name) {
+    if (this.enabled && this.samples[name]) {
+      this.resumeContext().then(() => {
+        this.samples[name].play();
+      });
+    }
   }
-}
+};
 AUDIO.init();
 window.AUDIO_enabled = function() {
   return AUDIO.enabled;
@@ -1371,6 +1378,7 @@ const SCENE = {
         startAnimateMs: 0
       },
       click(html3d, panel) {
+        const delayMs = 50;
         if ((panel.userData.opening !== true) && (panel.userData.closing !== true)) {
           if (panel.userData.opened !== true) {
             panel.userData.opening = true;
@@ -1382,38 +1390,38 @@ const SCENE = {
             {
               const gainNode1 = AUDIO.audioCtx.createGain();
               gainNode1.connect(AUDIO.audioCtxMainGain);
-              gainNode1.gain.setValueAtTime(0.50, AUDIO.audioCtx.currentTime);
+              gainNode1.gain.setValueAtTime(0.50, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator1 = AUDIO.audioCtx.createOscillator();
               oscillator1.type = 'triangle';
-              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime);
-              oscillator1.start(AUDIO.audioCtx.currentTime);
-              oscillator1.stop(AUDIO.audioCtx.currentTime + 0.6);
+              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator1.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator1.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 0.6);
               oscillator1.connect(gainNode1);
             }
             {
               const gainNode2 = AUDIO.audioCtx.createGain();
               gainNode2.connect(AUDIO.audioCtxMainGain);
-              gainNode2.gain.setValueAtTime(0.15, AUDIO.audioCtx.currentTime);
+              gainNode2.gain.setValueAtTime(0.15, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator2 = AUDIO.audioCtx.createOscillator();
               oscillator2.type = 'square';
-              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime);
+              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               oscillator2.connect(gainNode2);
-              oscillator2.start(AUDIO.audioCtx.currentTime);
-              oscillator2.stop(AUDIO.audioCtx.currentTime + 0.6);
+              oscillator2.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator2.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 0.6);
             }
             {
               const gainNode3 = AUDIO.audioCtx.createGain();
               gainNode3.connect(AUDIO.audioCtxMainGain);
-              gainNode3.gain.setValueAtTime(0.03, AUDIO.audioCtx.currentTime);
+              gainNode3.gain.setValueAtTime(0.03, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator3 = AUDIO.audioCtx.createOscillator();
               oscillator3.type = 'sine';
-              oscillator3.frequency.setValueAtTime(3000, AUDIO.audioCtx.currentTime);
+              oscillator3.frequency.setValueAtTime(3000, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               oscillator3.connect(gainNode3);
-              oscillator3.start(AUDIO.audioCtx.currentTime);
-              oscillator3.stop(AUDIO.audioCtx.currentTime + 0.6);
+              oscillator3.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator3.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 0.6);
             }
             panel.userData.waitAnimate = false;
-            panel.userData.startAnimateMs = performance.now();
+            panel.userData.startAnimateMs = performance.now() + delayMs;
           });
         }
       },
@@ -1423,24 +1431,28 @@ const SCENE = {
         }
         if (panel.userData.opening === true) {
           const elapsedMs = performance.now() - panel.userData.startAnimateMs;
-          panel.x = (doorWidth - 200) * (elapsedMs / 600);
-          if (panel.x > (doorWidth - 200)) {
-            panel.x = doorWidth - 200;
-            panel.userData.opening = false;
-            panel.userData.opened = true;
+          if (elapsedMs > 0) {
+            panel.x = (doorWidth - 200) * (elapsedMs / 600);
+            if (panel.x > (doorWidth - 200)) {
+              panel.x = doorWidth - 200;
+              panel.userData.opening = false;
+              panel.userData.opened = true;
+            }
+            panel.updateWorldMatrix();
+            html3d.requestRender = true;
           }
-          panel.updateWorldMatrix();
-          html3d.requestRender = true;
         } else if (panel.userData.closing === true) {
           const elapsedMs = performance.now() - panel.userData.startAnimateMs;
-          panel.x = (doorWidth - 200) - ((doorWidth - 200) * (elapsedMs / 600));
-          if (panel.x < 0) {
-            panel.x = 0;
-            panel.userData.closing = false;
-            panel.userData.opened = false;
+          if (elapsedMs > 0) {
+            panel.x = (doorWidth - 200) - ((doorWidth - 200) * (elapsedMs / 600));
+            if (panel.x < 0) {
+              panel.x = 0;
+              panel.userData.closing = false;
+              panel.userData.opened = false;
+            }
+            panel.updateWorldMatrix();
+            html3d.requestRender = true;
           }
-          panel.updateWorldMatrix();
-          html3d.requestRender = true;
         }
       }
     },
@@ -1734,31 +1746,37 @@ const SCENE = {
           return;
         }
         if (elevatorObject.userData.goingUp === true) {
-          elevatorObject.y = -(10 + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1700)));
-          if (elevatorObject.y < (-(wallHeight + floorDepth))) {
-            elevatorObject.y = -(wallHeight + floorDepth);
-            elevatorObject.userData.goingUp = false;
-            elevatorObject.userData.isUp = true;
+          const elapsedMs = performance.now() - elevatorObject.userData.startAnimateMs;
+          if (elapsedMs > 0) {
+            elevatorObject.y = -(10 + ((wallHeight + floorDepth) * (elapsedMs / 1700)));
+            if (elevatorObject.y < (-(wallHeight + floorDepth))) {
+              elevatorObject.y = -(wallHeight + floorDepth);
+              elevatorObject.userData.goingUp = false;
+              elevatorObject.userData.isUp = true;
+            }
+            elevatorObject.updateWorldMatrix();
+            if (elevatorObject.userData.animateCameraOnElevator === true) {
+              html3d.camera.y = elevatorObject.y - cameraHeight;
+              html3d.camera.updateWorldMatrix();
+            }
+            html3d.requestRender = true;
           }
-          elevatorObject.updateWorldMatrix();
-          if (elevatorObject.userData.animateCameraOnElevator === true) {
-            html3d.camera.y = elevatorObject.y - cameraHeight;
-            html3d.camera.updateWorldMatrix();
-          }
-          html3d.requestRender = true;
         } else if (elevatorObject.userData.goingDown === true) {
-          elevatorObject.y = (-(10 + (wallHeight + floorDepth))) + ((wallHeight + floorDepth) * ((performance.now() - elevatorObject.userData.startAnimateMs) / 1700));
-          if (elevatorObject.y > -10) {
-            elevatorObject.y = -10;
-            elevatorObject.userData.goingDown = false;
-            elevatorObject.userData.isUp = false;
+          const elapsedMs = performance.now() - elevatorObject.userData.startAnimateMs;
+          if (elapsedMs > 0) {
+            elevatorObject.y = (-(10 + (wallHeight + floorDepth))) + ((wallHeight + floorDepth) * (elapsedMs / 1700));
+            if (elevatorObject.y > -10) {
+              elevatorObject.y = -10;
+              elevatorObject.userData.goingDown = false;
+              elevatorObject.userData.isUp = false;
+            }
+            elevatorObject.updateWorldMatrix();
+            if (elevatorObject.userData.animateCameraOnElevator === true) {
+              html3d.camera.y = elevatorObject.y - cameraHeight;
+              html3d.camera.updateWorldMatrix();
+            }
+            html3d.requestRender = true;
           }
-          elevatorObject.updateWorldMatrix();
-          if (elevatorObject.userData.animateCameraOnElevator === true) {
-            html3d.camera.y = elevatorObject.y - cameraHeight;
-            html3d.camera.updateWorldMatrix();
-          }
-          html3d.requestRender = true;
         } else {
           if ((html3d.camera.x > (-buildingWidth / 2)) && (html3d.camera.x < (-buildingWidth / 2) + 3000) &&
               (html3d.camera.z > (-buildingDepth / 2)) && (html3d.camera.z < (-buildingDepth / 2) + 3000)) {
@@ -1796,6 +1814,7 @@ const SCENE = {
         </svg>
       `,
       click(html3d, panel) {
+        const delayMs = 50;
         const elevatorObject = html3d.panels.find((so) => so.id === 'elevator');
         if ((html3d.camera.x > (-buildingWidth / 2)) && (html3d.camera.x < (-buildingWidth / 2) + 3000) &&
             (html3d.camera.z > (-buildingDepth / 2)) && (html3d.camera.z < (-buildingDepth / 2) + 3000)) {
@@ -1814,38 +1833,38 @@ const SCENE = {
             {
               const gainNode1 = AUDIO.audioCtx.createGain();
               gainNode1.connect(AUDIO.audioCtxMainGain);
-              gainNode1.gain.setValueAtTime(0.50, AUDIO.audioCtx.currentTime);
+              gainNode1.gain.setValueAtTime(0.50, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator1 = AUDIO.audioCtx.createOscillator();
               oscillator1.type = 'triangle';
-              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime);
-              oscillator1.start(AUDIO.audioCtx.currentTime);
-              oscillator1.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator1.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator1.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 1.7);
               oscillator1.connect(gainNode1);
             }
             {
               const gainNode2 = AUDIO.audioCtx.createGain();
               gainNode2.connect(AUDIO.audioCtxMainGain);
-              gainNode2.gain.setValueAtTime(0.15, AUDIO.audioCtx.currentTime);
+              gainNode2.gain.setValueAtTime(0.15, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator2 = AUDIO.audioCtx.createOscillator();
               oscillator2.type = 'sawtooth';
-              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime);
+              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               oscillator2.connect(gainNode2);
-              oscillator2.start(AUDIO.audioCtx.currentTime);
-              oscillator2.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator2.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator2.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 1.7);
             }
             {
               const gainNode3 = AUDIO.audioCtx.createGain();
               gainNode3.connect(AUDIO.audioCtxMainGain);
-              gainNode3.gain.setValueAtTime(0.03, AUDIO.audioCtx.currentTime);
+              gainNode3.gain.setValueAtTime(0.03, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator3 = AUDIO.audioCtx.createOscillator();
               oscillator3.type = 'sine';
-              oscillator3.frequency.setValueAtTime(1000, AUDIO.audioCtx.currentTime);
+              oscillator3.frequency.setValueAtTime(1000, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               oscillator3.connect(gainNode3);
-              oscillator3.start(AUDIO.audioCtx.currentTime);
-              oscillator3.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator3.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator3.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 1.7);
             }
             elevatorObject.userData.waitAnimate = false;
-            elevatorObject.userData.startAnimateMs = performance.now();
+            elevatorObject.userData.startAnimateMs = performance.now() + delayMs;
           });
         }
       }
@@ -1883,6 +1902,7 @@ const SCENE = {
         </svg>
       `,
       click(html3d, panel) {
+        const delayMs = 50;
         const elevatorObject = html3d.panels.find((so) => so.id === 'elevator');
         if ((html3d.camera.x > (-buildingWidth / 2)) && (html3d.camera.x < (-buildingWidth / 2) + 3000) &&
             (html3d.camera.z > (-buildingDepth / 2)) && (html3d.camera.z < (-buildingDepth / 2) + 3000)) {
@@ -1901,38 +1921,38 @@ const SCENE = {
             {
               const gainNode1 = AUDIO.audioCtx.createGain();
               gainNode1.connect(AUDIO.audioCtxMainGain);
-              gainNode1.gain.setValueAtTime(0.50, AUDIO.audioCtx.currentTime);
+              gainNode1.gain.setValueAtTime(0.50, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator1 = AUDIO.audioCtx.createOscillator();
               oscillator1.type = 'triangle';
-              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime);
-              oscillator1.start(AUDIO.audioCtx.currentTime);
-              oscillator1.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator1.frequency.setValueAtTime(201, AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator1.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator1.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 1.7);
               oscillator1.connect(gainNode1);
             }
             {
               const gainNode2 = AUDIO.audioCtx.createGain();
               gainNode2.connect(AUDIO.audioCtxMainGain);
-              gainNode2.gain.setValueAtTime(0.15, AUDIO.audioCtx.currentTime);
+              gainNode2.gain.setValueAtTime(0.15, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator2 = AUDIO.audioCtx.createOscillator();
               oscillator2.type = 'sawtooth';
-              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime);
+              oscillator2.frequency.setValueAtTime(61, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               oscillator2.connect(gainNode2);
-              oscillator2.start(AUDIO.audioCtx.currentTime);
-              oscillator2.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator2.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator2.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 1.7);
             }
             {
               const gainNode3 = AUDIO.audioCtx.createGain();
               gainNode3.connect(AUDIO.audioCtxMainGain);
-              gainNode3.gain.setValueAtTime(0.03, AUDIO.audioCtx.currentTime);
+              gainNode3.gain.setValueAtTime(0.03, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               const oscillator3 = AUDIO.audioCtx.createOscillator();
               oscillator3.type = 'sine';
-              oscillator3.frequency.setValueAtTime(1000, AUDIO.audioCtx.currentTime);
+              oscillator3.frequency.setValueAtTime(1000, AUDIO.audioCtx.currentTime + (delayMs / 1000));
               oscillator3.connect(gainNode3);
-              oscillator3.start(AUDIO.audioCtx.currentTime);
-              oscillator3.stop(AUDIO.audioCtx.currentTime + 1.7);
+              oscillator3.start(AUDIO.audioCtx.currentTime + (delayMs / 1000));
+              oscillator3.stop(AUDIO.audioCtx.currentTime + (delayMs / 1000) + 1.7);
             }
             elevatorObject.userData.waitAnimate = false;
-            elevatorObject.userData.startAnimateMs = performance.now();
+            elevatorObject.userData.startAnimateMs = performance.now() + delayMs;
           });
         }
       }
@@ -2655,7 +2675,7 @@ const SCENE = {
         const iframePanel = html3d.panels.find((so) => so.id === 'arcadeCabinetIframe');
         if (iframePanel.userData.arcadeStarted !== true) {
           iframePanel.userData.arcadeStarted = true;
-          AUDIO.samples.newGame.play();
+          AUDIO.playSample('newGame');
           iframePanel.element.style.pointerEvents = 'auto';
           iframePanel.element.style.userSelect = 'auto';
           iframePanel.iframe.style.visibility = 'hidden';
@@ -2735,7 +2755,7 @@ const SCENE = {
           const iframeContentWindow = html3d.panels.find(p => p.id === 'arcadeCabinetIframe').iframe.contentWindow;
           if (iframeContentWindow?.html3dInstance) {
             iframeContentWindow.AUDIO_enable(AUDIO_enabled());
-            AUDIO.samples.copyIntoGame.play();
+            AUDIO.playSample('copyIntoGame');
             const sceneData = html3d.export();
             iframeContentWindow.html3dInstance.import(sceneData);
           }
@@ -2778,11 +2798,10 @@ const SCENE = {
           const iframeContentWindow = html3d.panels.find(p => p.id === 'arcadeCabinetIframe').iframe.contentWindow;
           if (iframeContentWindow?.html3dInstance) {
             AUDIO_enable(iframeContentWindow.AUDIO_enabled());
-            AUDIO.samples.teleportIntoGame.play();
+            AUDIO.playSample('teleportIntoGame');
             const sceneData = iframeContentWindow?.html3dInstance.export();
             html3d.import(sceneData);
           }
-
         });
       }
     },
