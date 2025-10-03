@@ -1,54 +1,8 @@
 
 class HTML3D {
   constructor(container, scene) {
-    this.camera = {
-      x: ((typeof scene?.camera?.x === 'number') ? scene.camera.x : 0),
-      y: ((typeof scene?.camera?.y === 'number') ? scene.camera.y : 0),
-      z: ((typeof scene?.camera?.z === 'number') ? scene.camera.z : 0),
-      rotationX: ((typeof scene?.camera?.rotationX === 'number') ? scene.camera.rotationX : 0),
-      rotationY: ((typeof scene?.camera?.rotationY === 'number') ? scene.camera.rotationY : 0),
-      collisionWidth: ((typeof scene?.camera?.collisionWidth === 'number') ? scene.camera.collisionWidth : 300),
-      collisionHeight: ((typeof scene?.camera?.collisionHeight === 'number') ? scene.camera.collisionHeight : 600),
-      fov: ((typeof scene?.camera?.fov === 'number') ? scene.camera.fov : 70),
-      worldMatrix: new HTML3D.Matrix4(),
-      viewMatrix: new HTML3D.Matrix4(),
-      updateWorldMatrix() {
-        this.worldMatrix.setTranslate(this.x, this.y, this.z);
-        this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateY(this.rotationY));
-        this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateX(this.rotationX));
-      },
-      userData: ((typeof scene?.camera?.userData === 'object') ? scene.camera.userData : null),
-      init: null,
-      animate: null
-    };
-    if (typeof scene?.camera?.init === 'function') {
-      this.camera.init = scene.camera.init;
-    } else if (typeof scene?.camera?.init === 'string') {
-      try {
-        this.camera.init = new Function('html3d', 'camera', scene.camera.init);
-      } catch (e) {
-        this.camera.init = null;
-        console.error(e);
-      }
-    } else {
-      this.camera.init = null;
-    }
-    if (this.camera.init !== null) {
-      this.camera.init(this, this.camera);
-    }
-    this.camera.updateWorldMatrix();
-    this.camera.animate = null;
-    if (typeof scene?.camera?.animate === 'function') {
-      this.camera.animate = scene.camera.animate;
-    } else if (typeof scene?.camera?.animate === 'string') {
-      try {
-        this.camera.animate = new Function('html3d', 'camera', scene.camera.animate);
-      } catch (e) {
-        this.camera.animate = null;
-        console.error(e);
-      }
-    }
     this.container = container;
+    this.camera = new HTML3D.Camera(this, scene?.camera);
     this.cameraContainer = document.createElement('div');
     Object.assign(this.cameraContainer.style, {
       position: 'absolute',
@@ -83,85 +37,32 @@ class HTML3D {
   }
   export() {
     const result = {
-      camera: {
-        x: this.camera.x,
-        y: this.camera.y,
-        z: this.camera.z,
-        rotationX: this.camera.rotationX,
-        rotationY: this.camera.rotationY,
-        collisionWidth: this.camera.collisionWidth,
-        collisionHeight: this.camera.collisionHeight,
-        fov: this.camera.fov,
-        userData: (this.camera.userData !== null) ? {...this.camera.userData} : null
-      },
+      camera: this.camera.export(),
       panels: this.panels.map((panel) => {
         return panel.export();
       })
     };
-    if (this.camera.init !== null) {
-      result.camera.init = this.camera.init.toString();
-      result.camera.init = result.camera.init.substring(result.camera.init.indexOf('{') + 1, result.camera.init.lastIndexOf('}')).trim();
-    }
-    if (this.camera.animate !== null) {
-      result.camera.animate = this.camera.animate.toString();
-      result.camera.animate = result.camera.animate.substring(result.camera.animate.indexOf('{') + 1, result.camera.animate.lastIndexOf('}')).trim();
-    }
     return result;
   }
   import(scene) {
+    this.camera.import(scene?.camera);
+    if (this.camera.init !== null) {
+      this.camera.init(this, this.camera);
+      this.camera.updateWorldMatrix();
+    }
     for (const panel of this.panels) {
       panel.element.remove();
     }
     this.panels = [];
-    if (scene?.camera) {
-      this.camera.x = (scene.camera.x !== undefined) ? scene.camera.x : 0;
-      this.camera.y = (scene.camera.y !== undefined) ? scene.camera.y : 0;
-      this.camera.z = (scene.camera.z !== undefined) ? scene.camera.z : 0;
-      this.camera.rotationX = (scene.camera.rotationX !== undefined) ? scene.camera.rotationX : 0;
-      this.camera.rotationY = (scene.camera.rotationY !== undefined) ? scene.camera.rotationY : 0;
-      this.camera.collisionWidth = (scene.camera.collisionWidth !== undefined) ? scene.camera.collisionWidth : 300;
-      this.camera.collisionHeight = (scene.camera.collisionHeight !== undefined) ? scene.camera.collisionHeight : 700;
-      this.camera.fov = (scene.camera.fov !== undefined) ? scene.camera.fov : 70;
-      this.camera.updateWorldMatrix();
-      this.camera.userData = (typeof scene.camera.userData === 'object') ? scene.camera.userData : null;
-      this.camera.init = null;
-      if (typeof scene.camera.init === 'function') {
-        this.camera.init = scene.camera.init;
-      } else if (typeof scene.camera.init === 'string') {
-        try {
-          this.camera.init = new Function('html3d', 'camera', scene.camera.init);
-        } catch (e) {
-          this.camera.init = null;
-          console.error(e);
-        }
-      } else {
-        this.camera.init = null;
-      }
-      this.camera.animate = null;
-      if (typeof scene.camera.animate === 'function') {
-        this.camera.animate = scene.camera.animate;
-      } else if (typeof scene.camera.animate === 'string') {
-        try {
-          this.camera.animate = new Function('html3d', 'camera', scene.camera.animate);
-        } catch (e) {
-          this.camera.animate = null;
-          console.error(e);
-        }
-      }
-    }
     if (Array.isArray(scene?.panels)) {
-      for (const panelData of scene.panels) {
-        this.panels.push(new HTML3D.Panel(this, panelData));
+      for (const panel of scene.panels) {
+        this.panels.push(new HTML3D.Panel(this, panel));
       }
     }
     for (const panel of this.panels) {
       if (panel.init !== null) {
         panel.init(this, panel);
       }
-    }
-    if (this.camera.init !== null) {
-      this.camera.init(this, this.camera);
-      this.camera.updateWorldMatrix();
     }
     this.requestRender = true;
   }
@@ -192,6 +93,7 @@ class HTML3D {
     requestAnimationFrame(() => this._thread());
   }
   checkAABBCollision(moveDirection) {
+    let result = false;
     const targetPosition = new HTML3D.Vector3(this.camera.x, this.camera.y, this.camera.z);
     targetPosition.add(moveDirection);
     const halfCameraWidth = (this.camera.collisionWidth / 2);
@@ -203,14 +105,125 @@ class HTML3D {
       const panel = this.panels[i];
       if (panel.boundingBox) {
         if (cameraBoundingBox.intersectsBox(panel.boundingBox)) {
-          return true;
+          result = true;
+          break;
         }
       }
     }
-    return false;
+    return result;
   }
 }
 {
+  HTML3D.Camera = class Camera {
+    constructor(html3d, camera) {
+      this.html3d = html3d;
+      Object.assign(this, {
+        html3d: html3d,
+        x: ((typeof camera?.x === 'number') ? camera.x : 0),
+        y: ((typeof camera?.y === 'number') ? camera.y : 0),
+        z: ((typeof camera?.z === 'number') ? camera.z : 0),
+        rotationX: ((typeof camera?.rotationX === 'number') ? camera.rotationX : 0),
+        rotationY: ((typeof camera?.rotationY === 'number') ? camera.rotationY : 0),
+        collisionWidth: ((typeof camera?.collisionWidth === 'number') ? camera.collisionWidth : 300),
+        collisionHeight: ((typeof camera?.collisionHeight === 'number') ? camera.collisionHeight : 600),
+        fov: ((typeof camera?.fov === 'number') ? camera.fov : 70),
+        worldMatrix: new HTML3D.Matrix4(),
+        viewMatrix: new HTML3D.Matrix4(),
+        userData: ((typeof camera?.userData === 'object') ? camera.userData : null),
+        init: null,
+        animate: null
+      });
+      if (typeof camera?.init === 'function') {
+        this.init = camera.init;
+      } else if (typeof camera?.init === 'string') {
+        try {
+          this.init = new Function('html3d', 'camera', camera.init);
+        } catch (e) {
+          this.init = null;
+          console.error(e);
+        }
+      }
+      if (this.init !== null) {
+        this.init(this.html3d, this);
+      }
+      this.updateWorldMatrix();
+      if (typeof camera?.animate === 'function') {
+        this.animate = camera.animate;
+      } else if (typeof camera?.animate === 'string') {
+        try {
+          this.animate = new Function('html3d', 'camera', camera.animate);
+        } catch (e) {
+          this.animate = null;
+          console.error(e);
+        }
+      }
+    }
+    export() {
+      const result = {
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        rotationX: this.rotationX,
+        rotationY: this.rotationY,
+        collisionWidth: this.collisionWidth,
+        collisionHeight: this.collisionHeight,
+        fov: this.fov,
+        userData: (this.userData !== null) ? {...this.userData} : null
+      };
+      if (typeof this.init === 'function') {
+        result.init = this.init.toString();
+        result.init = result.init.substring(result.init.indexOf('{') + 1, result.init.lastIndexOf('}')).trim();
+      }
+      if (typeof this.animate === 'function') {
+        result.animate = this.animate.toString();
+        result.animate = result.animate.substring(result.animate.indexOf('{') + 1, result.animate.lastIndexOf('}')).trim();
+      }
+      return result;
+    }
+    import(camera) {
+      this.x = (camera?.x !== undefined) ? camera.x : 0;
+      this.y = (camera?.y !== undefined) ? camera.y : 0;
+      this.z = (camera?.z !== undefined) ? camera.z : 0;
+      this.rotationX = (camera?.rotationX !== undefined) ? camera.rotationX : 0;
+      this.rotationY = (camera?.rotationY !== undefined) ? camera.rotationY : 0;
+      this.updateWorldMatrix();
+      this.collisionWidth = (camera?.collisionWidth !== undefined) ? camera.collisionWidth : 300;
+      this.collisionHeight = (camera?.collisionHeight !== undefined) ? camera.collisionHeight : 600;
+      this.fov = (camera?.fov !== undefined) ? camera.fov : 70;
+      this.userData = (typeof camera?.userData === 'object') ? camera.userData : null;
+      this.init = null;
+      if (typeof camera?.init === 'function') {
+        this.init = camera.init;
+      } else if (typeof camera?.init === 'string') {
+        try {
+          this.init = new Function('html3d', 'camera', camera.init);
+        } catch (e) {
+          this.init = null;
+          console.error(e);
+        }
+      }
+      if (this.init !== null) {
+        this.init(this.html3d, this);
+        this.updateWorldMatrix();
+      }
+      this.animate = null;
+      if (typeof camera?.animate === 'function') {
+        this.animate = camera.animate;
+      } else if (typeof camera?.animate === 'string') {
+        try {
+          this.animate = new Function('html3d', 'camera', camera.animate);
+        } catch (e) {
+          this.animate = null;
+          console.error(e);
+        }
+      }
+    }
+    updateWorldMatrix() {
+      this.worldMatrix.setTranslate(this.x, this.y, this.z);
+      this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateY(this.rotationY));
+      this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateX(this.rotationX));
+    }
+  };
   HTML3D.Panel = class Panel {
     constructor(html3d, scenePanel) {
       this.html3d = html3d;
@@ -332,7 +345,7 @@ class HTML3D {
       this.updateWorldMatrix();
     }
     export() {
-      const panelData = {
+      const result = {
         id: (this.id !== null) ? this.id : undefined,
         relativeToId: (this.relativeToId !== null) ? this.relativeToId : undefined,
         title: (this.title !== null) ? this.title : undefined,
@@ -355,21 +368,21 @@ class HTML3D {
         iframeHtml: (this.iframeHtml !== null) ? this.iframeHtml : undefined
       };
       if ((typeof this.userData === 'object') && (this.userData !== null)) {
-        panelData.userData = {...this.userData};
+        result.userData = {...this.userData};
       }
       if (typeof this.init === 'function') {
-        panelData.init = this.init.toString();
-        panelData.init = panelData.init.substring(panelData.init.indexOf('{') + 1, panelData.init.lastIndexOf('}')).trim();
+        result.init = this.init.toString();
+        result.init = result.init.substring(result.init.indexOf('{') + 1, result.init.lastIndexOf('}')).trim();
       }
       if (typeof this.click === 'function') {
-        panelData.click = this.click.toString();
-        panelData.click = panelData.click.substring(panelData.click.indexOf('{') + 1, panelData.click.lastIndexOf('}')).trim();
+        result.click = this.click.toString();
+        result.click = result.click.substring(result.click.indexOf('{') + 1, result.click.lastIndexOf('}')).trim();
       }
       if (typeof this.animate === 'function') {
-        panelData.animate = this.animate.toString();
-        panelData.animate = panelData.animate.substring(panelData.animate.indexOf('{') + 1, panelData.animate.lastIndexOf('}')).trim();
+        result.animate = this.animate.toString();
+        result.animate = result.animate.substring(result.animate.indexOf('{') + 1, result.animate.lastIndexOf('}')).trim();
       }
-      return panelData;
+      return result;
     }
     updateWorldMatrix() {
       this.worldMatrix.reset();
