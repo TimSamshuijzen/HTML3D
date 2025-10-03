@@ -92,10 +92,6 @@ class HTML3D {
   }
   import(scene) {
     this.camera.import(scene?.camera);
-    if (this.camera.init !== null) {
-      this.camera.init(this, this.camera);
-      this.camera.updateWorldMatrix();
-    }
     for (const panel of this.panels) {
       panel.element.remove();
     }
