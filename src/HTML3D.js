@@ -23,9 +23,9 @@ class HTML3D {
     };
     if (typeof scene?.camera?.init === 'function') {
       this.camera.init = scene.camera.init;
-    } else if (typeof scene?.camera?.initString === 'string') {
+    } else if (typeof scene?.camera?.init === 'string') {
       try {
-        this.camera.init = new Function('html3d', 'camera', scene.camera.initString);
+        this.camera.init = new Function('html3d', 'camera', scene.camera.init);
       } catch (e) {
         this.camera.init = null;
         console.error(e);
@@ -40,9 +40,9 @@ class HTML3D {
     this.camera.animate = null;
     if (typeof scene?.camera?.animate === 'function') {
       this.camera.animate = scene.camera.animate;
-    } else if (typeof scene?.camera?.animateString === 'string') {
+    } else if (typeof scene?.camera?.animate === 'string') {
       try {
-        this.camera.animate = new Function('html3d', 'camera', scene.camera.animateString);
+        this.camera.animate = new Function('html3d', 'camera', scene.camera.animate);
       } catch (e) {
         this.camera.animate = null;
         console.error(e);
@@ -99,12 +99,12 @@ class HTML3D {
       })
     };
     if (this.camera.init !== null) {
-      result.camera.initString = this.camera.init.toString();
-      result.camera.initString = result.camera.initString.substring(result.camera.initString.indexOf('{') + 1, result.camera.initString.lastIndexOf('}')).trim();
+      result.camera.init = this.camera.init.toString();
+      result.camera.init = result.camera.init.substring(result.camera.init.indexOf('{') + 1, result.camera.init.lastIndexOf('}')).trim();
     }
     if (this.camera.animate !== null) {
-      result.camera.animateString = this.camera.animate.toString();
-      result.camera.animateString = result.camera.animateString.substring(result.camera.animateString.indexOf('{') + 1, result.camera.animateString.lastIndexOf('}')).trim();
+      result.camera.animate = this.camera.animate.toString();
+      result.camera.animate = result.camera.animate.substring(result.camera.animate.indexOf('{') + 1, result.camera.animate.lastIndexOf('}')).trim();
     }
     return result;
   }
@@ -124,11 +124,12 @@ class HTML3D {
       this.camera.fov = (scene.camera.fov !== undefined) ? scene.camera.fov : 70;
       this.camera.updateWorldMatrix();
       this.camera.userData = (typeof scene.camera.userData === 'object') ? scene.camera.userData : null;
+      this.camera.init = null;
       if (typeof scene.camera.init === 'function') {
         this.camera.init = scene.camera.init;
-      } else if (typeof scene.camera.initString === 'string') {
+      } else if (typeof scene.camera.init === 'string') {
         try {
-          this.camera.init = new Function('html3d', 'camera', scene.camera.initString);
+          this.camera.init = new Function('html3d', 'camera', scene.camera.init);
         } catch (e) {
           this.camera.init = null;
           console.error(e);
@@ -139,9 +140,9 @@ class HTML3D {
       this.camera.animate = null;
       if (typeof scene.camera.animate === 'function') {
         this.camera.animate = scene.camera.animate;
-      } else if (typeof scene.camera.animateString === 'string') {
+      } else if (typeof scene.camera.animate === 'string') {
         try {
-          this.camera.animate = new Function('html3d', 'camera', scene.camera.animateString);
+          this.camera.animate = new Function('html3d', 'camera', scene.camera.animate);
         } catch (e) {
           this.camera.animate = null;
           console.error(e);
@@ -241,18 +242,18 @@ class HTML3D {
       });
       if (typeof scenePanel.init === 'function') {
         this.init = scenePanel.init;
-      } else if (typeof scenePanel.initString === 'string') {
+      } else if (typeof scenePanel.init === 'string') {
         try {
-          this.init = new Function('html3d', 'panel', scenePanel.initString);
+          this.init = new Function('html3d', 'panel', scenePanel.init);
         } catch (e) {
           this.init = null;
         }
       }
       if (typeof scenePanel.click === 'function') {
         this.click = scenePanel.click;
-      } else if (typeof scenePanel.clickString === 'string') {
+      } else if (typeof scenePanel.click === 'string') {
         try {
-          this.click = new Function('html3d', 'panel', scenePanel.clickString);
+          this.click = new Function('html3d', 'panel', scenePanel.click);
         } catch (e) {
           this.click = null;
           console.error(e);
@@ -260,9 +261,9 @@ class HTML3D {
       }
       if (typeof scenePanel.animate === 'function') {
         this.animate = scenePanel.animate;
-      } else if (typeof scenePanel.animateString === 'string') {
-        try { 
-          this.animate = new Function('html3d', 'panel', scenePanel.animateString);
+      } else if (typeof scenePanel.animate === 'string') {
+        try {
+          this.animate = new Function('html3d', 'panel', scenePanel.animate);
         } catch (e) {
           this.animate = null;
           console.error(e);
@@ -357,16 +358,16 @@ class HTML3D {
         panelData.userData = {...this.userData};
       }
       if (typeof this.init === 'function') {
-        panelData.initString = this.init.toString();
-        panelData.initString = panelData.initString.substring(panelData.initString.indexOf('{') + 1, panelData.initString.lastIndexOf('}')).trim();
+        panelData.init = this.init.toString();
+        panelData.init = panelData.init.substring(panelData.init.indexOf('{') + 1, panelData.init.lastIndexOf('}')).trim();
       }
       if (typeof this.click === 'function') {
-        panelData.clickString = this.click.toString();
-        panelData.clickString = panelData.clickString.substring(panelData.clickString.indexOf('{') + 1, panelData.clickString.lastIndexOf('}')).trim();
+        panelData.click = this.click.toString();
+        panelData.click = panelData.click.substring(panelData.click.indexOf('{') + 1, panelData.click.lastIndexOf('}')).trim();
       }
       if (typeof this.animate === 'function') {
-        panelData.animateString = this.animate.toString();
-        panelData.animateString = panelData.animateString.substring(panelData.animateString.indexOf('{') + 1, panelData.animateString.lastIndexOf('}')).trim();
+        panelData.animate = this.animate.toString();
+        panelData.animate = panelData.animate.substring(panelData.animate.indexOf('{') + 1, panelData.animate.lastIndexOf('}')).trim();
       }
       return panelData;
     }
