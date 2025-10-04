@@ -134,26 +134,6 @@ class HTML3D {
     }
     requestAnimationFrame(() => this._thread());
   }
-  checkAABBCollision(moveDirection) {
-    let result = false;
-    const targetPosition = new HTML3D.Vector3(this.camera.x, this.camera.y, this.camera.z);
-    targetPosition.add(moveDirection);
-    const halfCameraWidth = (this.camera.collisionWidth / 2);
-    const cameraBoundingBox = new HTML3D.BoundingBox(
-      new HTML3D.Vector3(targetPosition.x - halfCameraWidth, (targetPosition.y - 10), targetPosition.z - halfCameraWidth),
-      new HTML3D.Vector3(targetPosition.x + halfCameraWidth, (targetPosition.y + this.camera.collisionHeight), targetPosition.z + halfCameraWidth)
-    );
-    for (let i = 0, c = this.panels.length; i < c; i++) {
-      const panel = this.panels[i];
-      if (panel.boundingBox) {
-        if (cameraBoundingBox.intersectsBox(panel.boundingBox)) {
-          result = true;
-          break;
-        }
-      }
-    }
-    return result;
-  }
 }
 {
   HTML3D.Camera = class Camera {
@@ -166,8 +146,6 @@ class HTML3D {
         z: ((typeof camera?.z === 'number') ? camera.z : 0),
         rotationX: ((typeof camera?.rotationX === 'number') ? camera.rotationX : 0),
         rotationY: ((typeof camera?.rotationY === 'number') ? camera.rotationY : 0),
-        collisionWidth: ((typeof camera?.collisionWidth === 'number') ? camera.collisionWidth : 300),
-        collisionHeight: ((typeof camera?.collisionHeight === 'number') ? camera.collisionHeight : 600),
         fov: ((typeof camera?.fov === 'number') ? camera.fov : 70),
         worldMatrix: new HTML3D.Matrix4(),
         viewMatrix: new HTML3D.Matrix4(),
@@ -207,8 +185,6 @@ class HTML3D {
         z: this.z,
         rotationX: this.rotationX,
         rotationY: this.rotationY,
-        collisionWidth: this.collisionWidth,
-        collisionHeight: this.collisionHeight,
         fov: this.fov,
         userData: (this.userData !== null) ? {...this.userData} : null
       };
@@ -229,8 +205,6 @@ class HTML3D {
       this.rotationX = (camera?.rotationX !== undefined) ? camera.rotationX : 0;
       this.rotationY = (camera?.rotationY !== undefined) ? camera.rotationY : 0;
       this.updateWorldMatrix();
-      this.collisionWidth = (camera?.collisionWidth !== undefined) ? camera.collisionWidth : 300;
-      this.collisionHeight = (camera?.collisionHeight !== undefined) ? camera.collisionHeight : 600;
       this.fov = (camera?.fov !== undefined) ? camera.fov : 70;
       this.userData = (typeof camera?.userData === 'object') ? camera.userData : null;
       this.init = null;
@@ -775,8 +749,6 @@ const SCENE = {
     z: 10200,
     rotationX: 0,
     rotationY: 0,
-    collisionWidth: 300,
-    collisionHeight: 600,
     fov: 70,
     userData: {
       keyboard: {}
@@ -809,7 +781,29 @@ const SCENE = {
       });
     },
     animate(html3d, camera) {
-      let result = false;
+      const checkAABBCollision = (moveDirection) => {
+        let result = false;
+        const collisionWidth = 300;
+        const collisionHeight = 600;
+        const targetPosition = new HTML3D.Vector3(camera.x, camera.y, camera.z);
+        targetPosition.add(moveDirection);
+        const halfCameraWidth = (collisionWidth / 2);
+        const cameraBoundingBox = new HTML3D.BoundingBox(
+          new HTML3D.Vector3(targetPosition.x - halfCameraWidth, (targetPosition.y - 10), targetPosition.z - halfCameraWidth),
+          new HTML3D.Vector3(targetPosition.x + halfCameraWidth, (targetPosition.y + collisionHeight), targetPosition.z + halfCameraWidth)
+        );
+        for (let i = 0, c = html3d.panels.length; i < c; i++) {
+          const panel = html3d.panels[i];
+          if (panel.boundingBox) {
+            if (cameraBoundingBox.intersectsBox(panel.boundingBox)) {
+              result = true;
+              break;
+            }
+          }
+        }
+        return result;
+      };
+      let moved = false;
       const moveSpeed = 2500 * (1 / 60);
       const rotateSpeed = (Math.PI * 0.5) * (1 / 80);
       const forward = new HTML3D.Vector3(0, 0, -1);
@@ -821,11 +815,11 @@ const SCENE = {
       right.normalize();
       if (camera.userData.keyboard['ArrowLeft']) {
         camera.rotationY += rotateSpeed;
-        result = true;
+        moved = true;
       }
       if (camera.userData.keyboard['ArrowRight']) {
         camera.rotationY -= rotateSpeed;
-        result = true;
+        moved = true;
       }
       const intendedMove = new HTML3D.Vector3(0, 0, 0);
       if (camera.userData.keyboard['ArrowUp']) {
@@ -845,21 +839,21 @@ const SCENE = {
         intendedMove.multiplyScalar(moveSpeed);
         const finalMove = intendedMove.clone();
         const moveX = new HTML3D.Vector3(intendedMove.x, 0, 0);
-        if (html3d.checkAABBCollision(moveX)) {
+        if (checkAABBCollision(moveX)) {
           finalMove.x = 0;
         }
         const moveZ = new HTML3D.Vector3(0, 0, intendedMove.z);
-        if (html3d.checkAABBCollision(moveZ)) {
+        if (checkAABBCollision(moveZ)) {
           finalMove.z = 0;
         }
         if (finalMove.lengthSq() > 0) {
-          result = true;
+          moved = true;
           camera.x += finalMove.x;
           camera.y += finalMove.y;
           camera.z += finalMove.z;
         }
       }
-      if (result) {
+      if (moved) {
         camera.updateWorldMatrix();
         html3d.requestRender = true;
       }
