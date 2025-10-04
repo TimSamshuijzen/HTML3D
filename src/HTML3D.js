@@ -3,22 +3,15 @@ class HTML3D {
   constructor(container, scene) {
     this.container = container;
     this.camera = new HTML3D.Camera(this, scene?.camera);
-    this.cameraContainer = document.createElement('div');
-    Object.assign(this.cameraContainer.style, {
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      pointerEvents: 'none'
-    });
-    this.container.appendChild(this.cameraContainer);
     this.sceneContainer = document.createElement('div');
     Object.assign(this.sceneContainer.style, {
       position: 'absolute',
       width: '100%',
       height: '100%',
-      transformStyle: 'preserve-3d'
+      transformStyle: 'preserve-3d',
+      pointerEvents: 'none'
     });
-    this.cameraContainer.appendChild(this.sceneContainer);
+    this.container.appendChild(this.sceneContainer);
     this.panels = [];
     if (Array.isArray(scene?.panels)) {
       for (const scenePanel of scene.panels) {
@@ -38,9 +31,7 @@ class HTML3D {
   export() {
     const result = {
       camera: this.camera.export(),
-      panels: this.panels.map((panel) => {
-        return panel.export();
-      })
+      panels: this.panels.map((panel) => panel.export())
     };
     return result;
   }
@@ -357,7 +348,7 @@ class HTML3D {
     updateWorldMatrix() {
       this.worldMatrix.reset();
       if (this.relativeToId !== null) {
-        const relativeToPanel = this.html3d.panels.find((panel) => panel.id === this.relativeToId);
+        const relativeToPanel = this.html3d.panels.find((panel) => (panel.id === this.relativeToId));
         if (relativeToPanel) {
           this.worldMatrix.setMatrix(relativeToPanel.worldMatrix);
         }
@@ -602,9 +593,7 @@ class HTML3D {
       return this;
     }
     intersectsBox(box) {
-      return (this.max.x >= box.min.x) && (this.min.x <= box.max.x) && 
-        (this.max.y >= box.min.y) && (this.min.y <= box.max.y) && 
-        (this.max.z >= box.min.z) && (this.min.z <= box.max.z);
+      return ((this.max.x >= box.min.x) && (this.min.x <= box.max.x) && (this.max.y >= box.min.y) && (this.min.y <= box.max.y) && (this.max.z >= box.min.z) && (this.min.z <= box.max.z));
     }
   }
 }
