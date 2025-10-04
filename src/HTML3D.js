@@ -8,8 +8,7 @@ class HTML3D {
       position: 'absolute',
       width: '100%',
       height: '100%',
-      transformStyle: 'preserve-3d',
-      pointerEvents: 'none'
+      transformStyle: 'preserve-3d'
     });
     this.container.appendChild(this.sceneContainer);
     this.panels = [];
