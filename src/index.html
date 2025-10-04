@@ -786,7 +786,7 @@ const SCENE = {
       document.addEventListener('keydown', (event) => {
         if ((document.activeElement.tagName !== 'TEXTAREA') && (document.activeElement.tagName !== 'INPUT')) {
           camera.userData.keyboard[event.code] = true;
-          // In some rare cases the keyup event is not triggered, so we help the user get out of the stuck keys situation.
+          // When keyup event is not triggered, help user get out of the stuck keys situation.
           if (event.code === 'Escape') {
             camera.userData.keyboard = {};
           } else if (event.code === 'ArrowLeft') {
@@ -867,7 +867,7 @@ const SCENE = {
   },
   panels: [
     {
-      id: 'instructions',
+      id: 'html3dDemoInfo',
       width: 1500,
       height: 1500,
       x: -1500, 
