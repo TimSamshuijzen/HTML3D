@@ -17,8 +17,8 @@
 </head>
 <body style="margin: 0; overflow: hidden; background-color: #b5e7f7; font-family: Arial, sans-serif;">
   <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 50%; background-color: #F2DEC4;"></div>
-  <div id="container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
-  <div id="headerpanel" style="position: absolute; top: 0; left: 0; width: 100%; height: 40px; background-color: #333333; z-index: 10;">
+  <div id="container" style="position: absolute; top: 0px; left: 0; width: 100%; height: 100%;"></div>
+  <div id="headerpanel" style="position: absolute; top: 0; left: 0; width: 100%; height: 40px; background-color: #333333;">
     <div title="html3d.com" style="position: absolute; left: 20px; top: 0px; width: 90px; height: 40px; color: #cccccc;">
       <a href="https://html3d.com/"><span style="color: #80cccc; font-size: 16px; line-height: 40px;">HTML3D</span></a>
     </div>
@@ -765,9 +765,7 @@ const SCENE = {
       document.addEventListener('keyup', (event) => {
         camera.userData.keyboard[event.code] = undefined;
       });
-    },
-    animate(html3d, camera) {
-      const checkAABBCollision = (moveDirection) => {
+      camera.checkAABBCollision = (moveDirection) => {
         let result = false;
         const collisionWidth = 300;
         const collisionHeight = 600;
@@ -788,7 +786,9 @@ const SCENE = {
           }
         }
         return result;
-      };
+      };      
+    },
+    animate(html3d, camera) {
       let moved = false;
       const moveSpeed = 2500 * (1 / 60);
       const rotateSpeed = (Math.PI * 0.5) * (1 / 80);
@@ -825,11 +825,11 @@ const SCENE = {
         intendedMove.multiplyScalar(moveSpeed);
         const finalMove = intendedMove.clone();
         const moveX = new HTML3D.Vector3(intendedMove.x, 0, 0);
-        if (checkAABBCollision(moveX)) {
+        if (camera.checkAABBCollision(moveX)) {
           finalMove.x = 0;
         }
         const moveZ = new HTML3D.Vector3(0, 0, intendedMove.z);
-        if (checkAABBCollision(moveZ)) {
+        if (camera.checkAABBCollision(moveZ)) {
           finalMove.z = 0;
         }
         if (finalMove.lengthSq() > 0) {
