@@ -88,26 +88,6 @@ class HTML3D {
     }
     requestAnimationFrame(() => this._thread());
   }
-  checkAABBCollision(moveDirection) {
-    let result = false;
-    const targetPosition = new HTML3D.Vector3(this.camera.x, this.camera.y, this.camera.z);
-    targetPosition.add(moveDirection);
-    const halfCameraWidth = (this.camera.collisionWidth / 2);
-    const cameraBoundingBox = new HTML3D.BoundingBox(
-      new HTML3D.Vector3(targetPosition.x - halfCameraWidth, (targetPosition.y - 10), targetPosition.z - halfCameraWidth),
-      new HTML3D.Vector3(targetPosition.x + halfCameraWidth, (targetPosition.y + this.camera.collisionHeight), targetPosition.z + halfCameraWidth)
-    );
-    for (let i = 0, c = this.panels.length; i < c; i++) {
-      const panel = this.panels[i];
-      if (panel.boundingBox) {
-        if (cameraBoundingBox.intersectsBox(panel.boundingBox)) {
-          result = true;
-          break;
-        }
-      }
-    }
-    return result;
-  }
 }
 {
   HTML3D.Camera = class Camera {
@@ -120,8 +100,6 @@ class HTML3D {
         z: ((typeof camera?.z === 'number') ? camera.z : 0),
         rotationX: ((typeof camera?.rotationX === 'number') ? camera.rotationX : 0),
         rotationY: ((typeof camera?.rotationY === 'number') ? camera.rotationY : 0),
-        collisionWidth: ((typeof camera?.collisionWidth === 'number') ? camera.collisionWidth : 300),
-        collisionHeight: ((typeof camera?.collisionHeight === 'number') ? camera.collisionHeight : 600),
         fov: ((typeof camera?.fov === 'number') ? camera.fov : 70),
         worldMatrix: new HTML3D.Matrix4(),
         viewMatrix: new HTML3D.Matrix4(),
@@ -161,8 +139,6 @@ class HTML3D {
         z: this.z,
         rotationX: this.rotationX,
         rotationY: this.rotationY,
-        collisionWidth: this.collisionWidth,
-        collisionHeight: this.collisionHeight,
         fov: this.fov,
         userData: (this.userData !== null) ? {...this.userData} : null
       };
@@ -183,8 +159,6 @@ class HTML3D {
       this.rotationX = (camera?.rotationX !== undefined) ? camera.rotationX : 0;
       this.rotationY = (camera?.rotationY !== undefined) ? camera.rotationY : 0;
       this.updateWorldMatrix();
-      this.collisionWidth = (camera?.collisionWidth !== undefined) ? camera.collisionWidth : 300;
-      this.collisionHeight = (camera?.collisionHeight !== undefined) ? camera.collisionHeight : 600;
       this.fov = (camera?.fov !== undefined) ? camera.fov : 70;
       this.userData = (typeof camera?.userData === 'object') ? camera.userData : null;
       this.init = null;
