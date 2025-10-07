@@ -913,18 +913,37 @@ const SCENE = {
         <div style="position: absolute; left: 100px; top: 750px; width: 1100px; height: 150px; color: #ffffff; font-size: 100px;">
           interact
         </div>
-        <div style="position: absolute; left: 200px; top: 900px; width: 1300px; height: 490px;">
+        <div style="position: absolute; left: 200px; top: 900px; width: 1300px; height: 530px;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 0px; top: 0px; width: 200px; height: 200px;">
             <path fill="#ffffff" d="M11,1.07C7.05,1.56 4,4.92 4,9H11M4,15A8,8 0 0,0 12,23A8,8 0 0,0 20,15V11H4M13,1.07V9H20C20,4.92 16.94,1.56 13,1.07Z" />
           </svg>
-          <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 490px; color: #ffffff; font-size: 42px;">
+          <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 530px; color: #ffffff; font-size: 42px;">
             All objects are HTML elements, positioned in 3D space with CSS 3D transforms. You can click on them to interact, as you would with any other HTML element.
             <br />
             When an input field has focus, the keyboard controls for moving are disabled.
             To resume being able to move with the keyboard, click outside the input field.
+            For example, here is a text input field. <input id="exampleInput" type="text" value="" style="width: 400px; font-size: 32px; border: 8px solid #000000; background-color: #ffffff; color: #000000;" />
           </div>
         </div>
-      `
+      `,
+      userData: {
+        exampleInputValue: 'Click here to edit'
+      },
+      init(html3d, panel) {
+        const exampleInput = document.getElementById('exampleInput');
+        exampleInput.value = panel.userData.exampleInputValue;
+        exampleInput.addEventListener('input', (event) => {
+          panel.userData.exampleInputValue = event.target.value;
+        });
+      },
+      animate(html3d, panel) {
+        const exampleInput = document.getElementById('exampleInput');
+        if (document.activeElement.id === 'exampleInput') {
+          exampleInput.style.borderColor = '#0088FF';
+        } else {
+          exampleInput.style.borderColor = '#000000';
+        }
+      }
     },
     {
       id: 'sceneEditor',
@@ -3111,7 +3130,7 @@ if (window.location.protocol === 'https:') {
   });
   headerpanel.appendChild(headerpaneldownloadlink);
   const downloadlink = document.createElement('div');
-  downloadlink.title = 'HTML3D is a portable web app. All the JavaScript code is in the html file.\nClick here to download the html file and create your own scenes.';
+  downloadlink.title = 'HTML3D demo is a portable web app. All the JavaScript code is in the html file.\nClick here to download the html file and create your own scenes.';
   Object.assign(downloadlink.style, {
     position: 'absolute',
     left: '10px',
@@ -3148,7 +3167,7 @@ if (window.location.protocol === 'https:') {
     lineHeight: '24px',
     whiteSpace: 'nowrap'
   });
-  downloadlink_text.innerHTML = 'Download HTML3D';
+  downloadlink_text.innerHTML = 'Download HTML3D demo';
   downloadlink.appendChild(downloadlink_text);
   let downloaded = false;
   downloadlink.addEventListener('click', async () => {
@@ -3159,7 +3178,7 @@ if (window.location.protocol === 'https:') {
     downloadlink.title = '';
     downloadlink.style.cursor = 'default';
     downloadlink_svg.style.display = 'none';
-    downloadlink_text.innerHTML = 'downloading HTML3D ...';
+    downloadlink_text.innerHTML = 'downloading HTML3D demo...';
     try {
       const response = await fetch(window.location.href);
       let html = await response.text();
