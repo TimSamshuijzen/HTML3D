@@ -922,12 +922,13 @@ const SCENE = {
             <br />
             When an input field has focus, the keyboard controls for moving are disabled.
             To resume being able to move with the keyboard, click outside the input field.
-            For example, here is a text input field. <input id="exampleInput" type="text" value="" style="width: 400px; font-size: 32px; border: 8px solid #000000; background-color: #ffffff; color: #000000;" />
+            For example, here is a text input field: <input id="exampleInput" type="text" value="" style="width: 400px; font-size: 32px; border: 8px solid #000000; background-color: #ffffff; color: #000000;" />
           </div>
         </div>
       `,
       userData: {
-        exampleInputValue: 'Click here to edit'
+        exampleInputValue: 'Text input field - click here to edit - then click outside to resume moving with cursor keys',
+        hasFocus: false
       },
       init(html3d, panel) {
         const exampleInput = document.getElementById('exampleInput');
@@ -937,11 +938,18 @@ const SCENE = {
         });
       },
       animate(html3d, panel) {
-        const exampleInput = document.getElementById('exampleInput');
         if (document.activeElement.id === 'exampleInput') {
-          exampleInput.style.borderColor = '#0088FF';
+          if (panel.userData.hasFocus === false) {
+            panel.userData.hasFocus = true;
+            const exampleInput = document.getElementById('exampleInput');
+            exampleInput.style.borderColor = '#0088FF';
+          }
         } else {
-          exampleInput.style.borderColor = '#000000';
+          if (panel.userData.hasFocus === true) {
+            panel.userData.hasFocus = false;
+            const exampleInput = document.getElementById('exampleInput');
+            exampleInput.style.borderColor = '#000000';
+          }
         }
       }
     },
