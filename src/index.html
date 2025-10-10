@@ -1114,13 +1114,17 @@ const SCENE = {
       },
       animate(html3d, panel) {
         if (document.activeElement.id === 'scenejsonTextarea') {
-          if (!panel.userData.hasFocus) {
+          if (panel.userData.hasFocus === false) {
             panel.userData.hasFocus = true;
-            document.activeElement.style.borderColor = '#0088ff';
+            const scenejsonTextarea = document.getElementById('scenejsonTextarea');
+            scenejsonTextarea.style.borderColor = '#0088ff';
           }
-        } else if (panel.userData.hasFocus) {
-          panel.userData.hasFocus = false;
-          document.getElementById('scenejsonTextarea').style.borderColor = '#979797';
+        } else {
+          if (panel.userData.hasFocus === true) {
+            panel.userData.hasFocus = false;
+            const scenejsonTextarea = document.getElementById('scenejsonTextarea');
+            scenejsonTextarea.style.borderColor = '#979797';
+          }
         }
       }
     },
@@ -3061,12 +3065,12 @@ const SCENE = {
       },
       animate(html3d, panel) {
         if (document.activeElement === panel.iframe) {
-          if (!panel.userData.hasFocus) {
+          if (panel.userData.hasFocus === false) {
             panel.userData.hasFocus = true;
             panel.element.style.borderColor = '#0088ff';
           }
         } else {
-          if (panel.userData.hasFocus) {
+          if (panel.userData.hasFocus === true) {
             panel.userData.hasFocus = false;
             panel.element.style.borderColor = '#000000';
           }
