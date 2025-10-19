@@ -2158,7 +2158,7 @@ const SCENE = {
           html3d.requestRender = true;
           yValue.textContent = `${testPanel.y} px`;
           testPanelContent.innerHTML = JSON.stringify(testPanel.export(), null, 2).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          yValueReset.style.visibility = (testPanel.y === 0) ? 'hidden' : 'visible';
+          yValueReset.style.visibility = 'hidden'; // (testPanel.y === 0) ? 'hidden' : 'visible';
         });
         yValueReset.addEventListener('click', () => {
           testPanel.y = 0;
@@ -2242,7 +2242,7 @@ const SCENE = {
         xValueReset.style.visibility = (testPanel.x === 0) ? 'hidden' : 'visible';
         yInput.value = testPanel.y;
         yValue.textContent = `${testPanel.y} px`;
-        yValueReset.style.visibility = (testPanel.y === 0) ? 'hidden' : 'visible';
+        yValueReset.style.visibility = 'hidden'; // (testPanel.y === 0) ? 'hidden' : 'visible';
         zInput.value = testPanel.z;
         zValue.textContent = `${testPanel.z} px`;
         zValueReset.style.visibility = (testPanel.z === 0) ? 'hidden' : 'visible';
@@ -2974,7 +2974,7 @@ const SCENE = {
           firePixels: null,
           paletteRgb: (panel.userData.darkBackground ?
             [
-              // pallet for black background
+              // palette for black background
               '#070707', '#1F0707', '#2F0F07', '#470F07', '#571707',
               '#671F07', '#771F07', '#8F2707', '#9F2F07', '#AF3F07',
               '#BF4707', '#C74707', '#DF4F07', '#DF5707', '#DF5707',
