@@ -313,7 +313,6 @@ class HTML3D {
         this.element.style.border = '5px solid ' + this.backgroundColor;
         this.iframe = document.createElement('iframe');
         this.iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-        this.iframe.setAttribute('allowfullscreen', 'true');
         if (this.iframeSrc !== null) {
           this.iframe.src = this.iframeSrc;
         } else if (this.iframeHtml !== null) {
@@ -921,9 +920,9 @@ const SCENE = {
           <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 530px; color: #ffffff; font-size: 42px;">
             All objects are HTML elements, positioned in 3D space with CSS 3D transforms. You can click on them to interact, as you would with any other HTML element.
             <br />
-            When an input field or iframe has focus, it has a blue border, and the keyboard keys for movement are disabled.
-            To resume keyboard movement control, click outside the input field.
-            For example, here is an input field: <input id="exampleInput" type="text" value="" style="width: 400px; font-size: 32px; border: 8px solid #000000; background-color: #ffffff; color: #000000;" />
+            When an input field or iframe has focus it has a blue border and keyboard movement control is disabled.
+            For example, click on this input field: <input id="exampleInput" type="text" value="" style="width: 400px; font-size: 32px; border: 8px solid #000000; background-color: #ffffff; color: #000000;" />
+            Then click outside the input field to resume keyboard movement control.
           </div>
         </div>
       `,
