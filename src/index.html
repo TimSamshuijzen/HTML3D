@@ -313,6 +313,7 @@ class HTML3D {
         this.element.style.border = '5px solid ' + this.backgroundColor;
         this.iframe = document.createElement('iframe');
         this.iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        this.iframe.setAttribute('allowfullscreen', 'true');
         if (this.iframeSrc !== null) {
           this.iframe.src = this.iframeSrc;
         } else if (this.iframeHtml !== null) {
@@ -3090,7 +3091,7 @@ const SCENE = {
       interaction: true,
       backgroundColor: '#444444',
       innerHTML: `
-        <div id="videoControls_onOffButton" title="Watch a YouTube video.\n\nWhen switching on, the video will not play automatically, you need to press play.\nAfter pressing play, click outside the video to regain keyboard movement control." style="position: absolute; left: 35px; top: 35px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; box-shadow: 0 0 15px #FFDF00;">
+        <div id="videoControls_onOffButton" title="Watch a YouTube video.\n\nIf you see an 'Error 153' message when switching on, then switch off and on to try again." style="position: absolute; left: 35px; top: 35px; width: 80px; height: 80px; border: 5px solid #FFDF00; border-radius: 60px; background-color: transparent; box-shadow: 0 0 15px #FFDF00;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 15px; top: 15px; width: 50px; height: 50px;" fill="#ffffff" stroke="none">
             <path d="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"></path>
           </svg>
@@ -3101,20 +3102,22 @@ const SCENE = {
         const fire = html3d.panels.find((so) => so.id === 'fire');
         const onOffButton = document.getElementById('videoControls_onOffButton');
         if (video.userData.isOn === false) {
-          video.iframe.src = 'https://www.youtube.com/embed/BiQXFKYa-co?autoplay=0&mute=0&controls=1&loop=0';
+          video.userData.isOn = true;
+          video.iframe.setAttribute('allow', 'autoplay;');
+          video.iframe.src = 'https://www.youtube-nocookie.com/embed/BiQXFKYa-co?autoplay=1&mute=0&controls=1&loop=0';
           video.element.style.pointerEvents = 'auto';
           video.element.style.userSelect = 'auto';
-          video.userData.isOn = true;
           onOffButton.style.border = '5px solid #55F755';
           onOffButton.style.boxShadow = '0 0 15px #00F700';
           onOffButton.style.textShadow = '0 0 8px #55F755';
           fire.element.style.visibility = 'hidden';
           fire.localData.visible = false;
         } else {
+          video.userData.isOn = false;
+          video.iframe.setAttribute('allow', '');
           video.iframe.src = '';
           video.element.style.pointerEvents = 'none';
           video.element.style.userSelect = 'none';
-          video.userData.isOn = false;
           onOffButton.style.border = '5px solid #FFDF00';
           onOffButton.style.boxShadow = '0 0 15px #F77C00';
           onOffButton.style.textShadow = '0 0 8px #F77C00';
