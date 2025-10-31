@@ -711,7 +711,7 @@ AUDIO_enable(true);
 document.getElementById('toggleSound').addEventListener('click', () => {
   AUDIO_enable(!AUDIO_enabled());
   if (AUDIO_enabled()) {
-    AUDIO.samples.soundOn.play();
+    AUDIO.playSample('soundOn');
   }
 });
 
@@ -755,6 +755,14 @@ const SCENE = {
             camera.userData.keyboard['ArrowDown'] = undefined;
           } else if (event.code === 'ArrowDown') {
             camera.userData.keyboard['ArrowUp'] = undefined;
+          } else if (event.code === 'KeyW') {
+            camera.userData.keyboard['KeyS'] = undefined;
+          } else if (event.code === 'KeyS') {
+            camera.userData.keyboard['KeyW'] = undefined;
+          } else if (event.code === 'KeyA') {
+            camera.userData.keyboard['KeyD'] = undefined;
+          } else if (event.code === 'KeyD') {
+            camera.userData.keyboard['KeyA'] = undefined;
           } else if (event.code === 'KeyZ') {
             camera.userData.keyboard['KeyX'] = undefined;
           } else if (event.code === 'KeyX') {
@@ -799,19 +807,19 @@ const SCENE = {
       const right = new HTML3D.Vector3(camera.worldMatrix.elements[0], camera.worldMatrix.elements[1], camera.worldMatrix.elements[2]);
       right.y = 0;
       right.normalize();
-      if (camera.userData.keyboard['ArrowLeft']) {
+      if ((camera.userData.keyboard['ArrowLeft']) || (camera.userData.keyboard['KeyA'])) {
         camera.rotationY += rotateSpeed;
         moved = true;
       }
-      if (camera.userData.keyboard['ArrowRight']) {
+      if ((camera.userData.keyboard['ArrowRight']) || (camera.userData.keyboard['KeyD'])) {
         camera.rotationY -= rotateSpeed;
         moved = true;
       }
       const intendedMove = new HTML3D.Vector3(0, 0, 0);
-      if (camera.userData.keyboard['ArrowUp']) {
+      if ((camera.userData.keyboard['ArrowUp']) || (camera.userData.keyboard['KeyW'])) {
         intendedMove.add(forward);
       }
-      if (camera.userData.keyboard['ArrowDown']) {
+      if ((camera.userData.keyboard['ArrowDown']) || (camera.userData.keyboard['KeyS'])) {
         intendedMove.sub(forward);
       }
       if (camera.userData.keyboard['KeyZ']) {
@@ -1817,7 +1825,7 @@ const SCENE = {
     },
     {
       id: 'groundFloorElevatorControls',
-      title: 'move elevator up or down',
+      title: 'elevator up/down',
       width: 300,
       height: 300,
       x: (-buildingWidth / 2) + 2000,
@@ -1905,7 +1913,7 @@ const SCENE = {
     },
     {
       id: 'firstFloorElevatorControls',
-      title: 'move elevator up or down',
+      title: 'elevator up/down',
       width: 300,
       height: 300,
       x: (-buildingWidth / 2) + 2000,
