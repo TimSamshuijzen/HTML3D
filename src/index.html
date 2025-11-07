@@ -22,12 +22,9 @@
     <div title="html3d.com" style="position: absolute; left: 20px; top: 0px; width: 90px; height: 40px; color: #cccccc;">
       <a href="https://html3d.com/"><span style="color: #80cccc; font-size: 16px; line-height: 40px;">HTML3D</span></a>
     </div>
-    <div title="complexity.zone" style="position: absolute; left: 110px; top: 0px; width: 140px; height: 40px; color: #cccccc; font-size: 10px; line-height: 40px;">
-      <a href="https://complexity.zone/">A <span style="color: #80cccc; ">complexity.zone</span> project</a>
+    <div id="toggleSound" title="enable/disable sounds" style="position: absolute; left: 150px; top: 0px; width: 40px; height: 40px; background-color: transparent; overflow: hidden; cursor: pointer;">
     </div>
-    <div id="toggleSound" title="enable/disable sounds" style="position: absolute; left: 250px; top: 0px; width: 40px; height: 40px; background-color: transparent; overflow: hidden; cursor: pointer;">
-    </div>
-    <div title="HTML3D at GitHub" style="position: absolute; left: 310px; top: 10px; width: 20px; height: 20px; background-color: transparent; overflow: hidden; cursor: pointer;">
+    <div title="HTML3D at GitHub" style="position: absolute; left: 210px; top: 10px; width: 20px; height: 20px; background-color: transparent; overflow: hidden; cursor: pointer;">
       <a href="https://github.com/TimSamshuijzen/HTML3D" target="_blank">
         <svg width="20" height="20" viewBox="0 0 1024 1024" style="width: 20px; height: 20px; background-color: transparent;">
           <path fill="#ffffff" fill-rule="evenodd" clip-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z" transform="scale(64)" />
@@ -983,26 +980,26 @@ const SCENE = {
           scene.json
         </div>
         <div id="scenejsonTextareaContainer" style="position: absolute; left: 100px; top: 250px; width: 1020px; height: 920px; background-color: transparent; overflow: visible;">
-          <textarea id="scenejsonTextarea" title="scene.json is a description of the entire 3D scene." style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #979797; background-color: #222222; color: #C7FFC7; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
+          <textarea id="scenejsonTextarea" title="scene.json is a description of the whole scene." style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #979797; background-color: #222222; color: #C9EAEA; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
           </textarea>
         </div>
         <div style="position: absolute; left: 1150px; top: 250px; width: 400px; height: 240px; color: #ffffff; font-size: 20px;">
           <span style="font-size: 50px;">🛈</span><br />
-          scene.json is a description of the entire 3D scene at startup, including camera position and this scene editor. You can modify scene.json and then set it as your new scene by clicking "Teleport into scene.json".<br />
+          scene.json is a description of the whole scene at startup, including camera position and this scene editor. You can modify scene.json and then set it as your new scene by clicking "Load scene.json".<br />
         </div>
-        <button id="scenejsonReadButton" title="Copy your scene state (including your camera position) to scene.json." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 23px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+        <button id="scenejsonReadButton" title="Take a snapshot of your scene state (including your camera position) and copy to the scene editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 23px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
           <span style="display: inline-block; width: 13px; height: 26px;"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; position: relative; left: 0px; top: 4px; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M13,22L3,12L13,2V8H21V16H13V22M6,12L11,17V14H19V10H11V7L6,12Z"></path>
           </svg>
           Copy your scene to scene.json
         </button>
-        <button id="scenejsonWriteButton" title="Load scene.json into your scene.\nYou will teleport into the scene defined in scene.json when you click this button." style="position: absolute; left: 1150px; top: 570px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+        <button id="scenejsonWriteButton" title="Load scene.json into your scene.\nYou will teleport into the scene defined in scene.json." style="position: absolute; left: 1150px; top: 570px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
           <span style="display: inline-block; width: 13px; height: 26px;"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; position: relative; left: 0px; top: 4px; width: 26px; height: 26px;" fill="#000000" stroke="none">
-            <path d="M7,11H1V13H7V11M9.17,7.76L7.05,5.64L5.64,7.05L7.76,9.17L9.17,7.76M13,1H11V7H13V1M18.36,7.05L16.95,5.64L14.83,7.76L16.24,9.17L18.36,7.05M17,11V13H23V11H17M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M14.83,16.24L16.95,18.36L18.36,16.95L16.24,14.83L14.83,16.24M5.64,16.95L7.05,18.36L9.17,16.24L7.76,14.83L5.64,16.95M11,23H13V17H11V23Z"></path>
+            <path d="M11,16H3V8H11V2L21,12L11,22V16M13,7V10H5V14H13V17L18,12L13,7Z"></path>
           </svg>
-          Teleport into scene.json
+          Load scene.json
         </button>
         <button id="scenejsonCopyToClipboardButton" style="position: absolute; left: 1150px; top: 760px; width: 400px; height: 50px; font-size: 24px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
           <span style="display: inline-block; width: 13px; height: 26px;"></span>
@@ -1023,7 +1020,7 @@ const SCENE = {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z"></path>
           </svg>
-          Open scene json file
+          Open scene.json file
         </button>
       `,
       userData: {
@@ -1052,7 +1049,7 @@ const SCENE = {
           } catch (error) {
             jsonObject = undefined;
           }
-          textarea.style.color = (jsonObject !== undefined) ? '#C7FFC7' : '#FFC7C7';
+          textarea.style.color = (jsonObject !== undefined) ? '#C9EAEA' : '#FFC7C7';
           scenejsonWriteButton.disabled = (jsonObject === undefined);
           scenejsonWriteButton.style.backgroundColor = (jsonObject !== undefined) ? '#f0f0f0' : '#cccccc';
           scenejsonWriteButton.style.cursor = (jsonObject !== undefined) ? 'pointer' : 'not-allowed';
@@ -1109,7 +1106,7 @@ const SCENE = {
                 } catch (error) {
                   jsonObject = undefined;
                 }
-                textarea.style.backgroundColor = (jsonObject !== undefined) ? '#ffffff' : '#ffeeee';
+                textarea.style.color = (jsonObject !== undefined) ? '#C9EAEA' : '#FFC7C7';
                 scenejsonWriteButton.disabled = (jsonObject === undefined);
                 scenejsonWriteButton.style.backgroundColor = (jsonObject !== undefined) ? '#f0f0f0' : '#cccccc';
                 scenejsonWriteButton.style.cursor = (jsonObject !== undefined) ? 'pointer' : 'not-allowed';
