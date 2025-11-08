@@ -594,3 +594,5 @@ class HTML3D {
     }
   }
 }
+
+export default HTML3D;

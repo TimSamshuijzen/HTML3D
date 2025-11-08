@@ -35,7 +35,7 @@
   <script>
 
 // Code sections:
-//   HTML3D - Library for creating interactive 3D scenes with HTML elements
+//   HTML3D - Library for creating 3D scenes with HTML elements
 //   AUDIO - Setup audio
 //   SCENE - Define the scene
 
@@ -869,7 +869,7 @@ const SCENE = {
           </div>
         </div>
         <div style="position: absolute; left: 100px; top: 180px; width: 1400px; height: 100px; color: #ffffff; font-size: 35px;">
-          HTML3D is a JavaScript library for creating 3D scenes using CSS 3D transforms.<br />
+          HTML3D is a JavaScript library for creating 3D scenes with HTML elements.<br />
           This demo is a showcase of HTML3D capabilities.
         </div>
         <div style="position: absolute; left: 100px; top: 300px; width: 1100px; height: 120px; color: #ffffff; font-size: 100px;">
@@ -989,7 +989,7 @@ const SCENE = {
           <span style="font-size: 50px;">🛈</span><br />
           scene.json is a description of the whole scene at startup, including camera position and this scene editor. You can modify scene.json and then set it as your new scene by clicking "Load scene.json".<br />
         </div>
-        <button id="scenejsonReadButton" title="Take a snapshot of your scene state and copy it to scene.json in the scene editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 23px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+        <button id="scenejsonReadButton" title="Take a snapshot of your scene state, including your camera position, and copy it to scene.json in the scene editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 23px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
           <span style="display: inline-block; width: 13px; height: 26px;"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; position: relative; left: 0px; top: 4px; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M13,22L3,12L13,2V8H21V16H13V22M6,12L11,17V14H19V10H11V7L6,12Z"></path>
@@ -1053,7 +1053,7 @@ const SCENE = {
           }
           textarea.style.color = (jsonObject !== undefined) ? '#C9EAEA' : '#FFC7C7';
           scenejsonWriteButton.disabled = (jsonObject === undefined);
-          scenejsonWriteButton.style.backgroundColor = (jsonObject !== undefined) ? '#f0f0f0' : '#cccccc';
+          scenejsonWriteButton.style.backgroundColor = (jsonObject !== undefined) ? '#f0f0f0' : '#aaaaaa';
           scenejsonWriteButton.style.cursor = (jsonObject !== undefined) ? 'pointer' : 'not-allowed';
         });
         scenejsonReadButton.addEventListener('click', () => {
