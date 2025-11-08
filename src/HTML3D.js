@@ -14,8 +14,7 @@ class HTML3D {
     this.panels = [];
     if (Array.isArray(scene?.panels)) {
       for (const scenePanel of scene.panels) {
-        const panel = new HTML3D.Panel(this, scenePanel);
-        this.panels.push(panel);
+        this.panels.push(new HTML3D.Panel(this, scenePanel));
       }
     }
     this.requestRender = true;
@@ -82,7 +81,6 @@ class HTML3D {
 {
   HTML3D.Camera = class Camera {
     constructor(html3d, camera) {
-      this.html3d = html3d;
       Object.assign(this, {
         html3d: html3d,
         x: ((typeof camera?.x === 'number') ? camera.x : 0),
