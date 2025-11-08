@@ -868,10 +868,14 @@ const SCENE = {
             HTML3D demo
           </div>
         </div>
-        <div style="position: absolute; left: 100px; top: 200px; width: 1100px; height: 120px; color: #ffffff; font-size: 100px;">
+        <div style="position: absolute; left: 100px; top: 180px; width: 1400px; height: 100px; color: #ffffff; font-size: 35px;">
+          HTML3D is a JavaScript library for creating 3D scenes using CSS 3D transforms.<br />
+          This demo is a showcase of HTML3D capabilities.
+        </div>
+        <div style="position: absolute; left: 100px; top: 300px; width: 1100px; height: 120px; color: #ffffff; font-size: 100px;">
           move
         </div>
-        <div style="position: absolute; left: 200px; top: 320px; width: 1300px; height: 420px;">
+        <div style="position: absolute; left: 200px; top: 420px; width: 1300px; height: 350px;">
           <div style="position: absolute; left: 0px; top: 0px; width: 250px; height: 310px;">
             <div style="position: absolute; left: 0px; top: 160px; width: 100px; height: 100px; border: 10px solid #ffffff; border-radius: 10px; color: #ffffff; font-size: 80px; line-height: 100px; text-align: center;">
               z
@@ -913,24 +917,24 @@ const SCENE = {
             </div>
           </div>
         </div>
-        <div style="position: absolute; left: 100px; top: 750px; width: 1100px; height: 150px; color: #ffffff; font-size: 100px;">
+        <div style="position: absolute; left: 100px; top: 800px; width: 1100px; height: 150px; color: #ffffff; font-size: 100px;">
           interact
         </div>
-        <div style="position: absolute; left: 200px; top: 900px; width: 1300px; height: 530px;">
+        <div style="position: absolute; left: 200px; top: 980px; width: 1300px; height: 480px;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="position: absolute; left: 0px; top: 0px; width: 200px; height: 200px;">
             <path fill="#ffffff" d="M11,1.07C7.05,1.56 4,4.92 4,9H11M4,15A8,8 0 0,0 12,23A8,8 0 0,0 20,15V11H4M13,1.07V9H20C20,4.92 16.94,1.56 13,1.07Z" />
           </svg>
-          <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 530px; color: #ffffff; font-size: 42px;">
+          <div style="position: absolute; left: 280px; top: 0px; width: 900px; height: 480px; color: #ffffff; font-size: 38px;">
             All objects are HTML elements, positioned in 3D space with CSS 3D transforms. You can click on them to interact, as you would with any other HTML element.
             <br />
-            When an input field or iframe has focus it has a blue border and keyboard movement control is disabled.
-            For example, click on this input field: <input id="exampleInput" type="text" value="" style="width: 400px; font-size: 32px; border: 8px solid #000000; background-color: #ffffff; color: #000000;" />
+            When an input field or iframe has focus, it has a blue border and keyboard movement control is disabled.
+            For example, click on this input field: <input id="exampleInput" type="text" value="" style="width: 200px; font-size: 28px; border: 8px solid #000000; background-color: #ffffff; color: #000000;" />
             Then click outside the input field to resume keyboard movement control.
           </div>
         </div>
       `,
       userData: {
-        exampleInputValue: 'Click here for focus, then click outside to resume keyboard movement control.',
+        exampleInputValue: '',
         hasFocus: false
       },
       init(html3d, panel) {
@@ -981,11 +985,11 @@ const SCENE = {
           <textarea id="scenejsonTextarea" style="position: absolute; left: 0px; top: 0px; width: 1000px; height: 900px; border: 10px solid #979797; background-color: #222222; color: #C9EAEA; font-size: 20px; font-family: monospace; white-space: nowrap; overflow: auto; resize: none;">
           </textarea>
         </div>
-        <div style="position: absolute; left: 1150px; top: 250px; width: 400px; height: 240px; color: #ffffff; font-size: 20px;">
+        <div style="position: absolute; left: 1150px; top: 250px; width: 490px; height: 240px; color: #ffffff; font-size: 20px;">
           <span style="font-size: 50px;">🛈</span><br />
           scene.json is a description of the whole scene at startup, including camera position and this scene editor. You can modify scene.json and then set it as your new scene by clicking "Load scene.json".<br />
         </div>
-        <button id="scenejsonReadButton" title="Take a snapshot of your scene state (including your camera position) and copy to the scene editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 23px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
+        <button id="scenejsonReadButton" title="Take a snapshot of your scene state and copy it to scene.json in the scene editor." style="position: absolute; left: 1150px; top: 500px; width: 400px; height: 50px; font-size: 23px; background-color: #f0f0f0; color: #000000; white-space: nowrap; text-align: left; cursor: pointer;">
           <span style="display: inline-block; width: 13px; height: 26px;"></span>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: inline-block; position: relative; left: 0px; top: 4px; width: 26px; height: 26px;" fill="#000000" stroke="none">
             <path d="M13,22L3,12L13,2V8H21V16H13V22M6,12L11,17V14H19V10H11V7L6,12Z"></path>
