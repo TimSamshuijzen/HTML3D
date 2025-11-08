@@ -3,7 +3,7 @@ HTML3D is a lightweight JavaScript library for creating interactive 3D scenes us
 
 See the demo at: https://html3d.com
 
-![HTML3D demo](./src/html3d_demo_screenshot1.png?raw=true "HTML3D demo")
+![HTML3D demo](./html3d_demo_screenshot1.png?raw=true "HTML3D demo")
 
 **src/index.html**<br>
 index.html is a demo of HTML3D. The demo showcases a recursive game-within-a-game. 
