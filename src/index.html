@@ -1058,6 +1058,10 @@ const SCENE = {
         });
         scenejsonReadButton.addEventListener('click', () => {
           textarea.value = JSON.stringify(html3d.export(), null, 2);
+          textarea.style.color = '#C9EAEA';
+          scenejsonWriteButton.disabled = false;
+          scenejsonWriteButton.style.backgroundColor = '#f0f0f0';
+          scenejsonWriteButton.style.cursor = 'pointer';
           textarea.scrollTop = 0;
         });
         scenejsonWriteButton.addEventListener('click', () => {
