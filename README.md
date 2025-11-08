@@ -14,5 +14,8 @@ All the code is in the html file. You can use this file as a starting point for 
 HTML3D JavaScript module.<br />
 Usage:<br />
 ```
-import HTML3D from "./HTML3D.js";
+<script type="module">
+  import HTML3D from "./HTML3D.js";
+  ...
+</script>
 ```
