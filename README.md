@@ -8,7 +8,6 @@ https://html3d.com
 
 **src/index.html**<br />
 This html file is the homepage of html3d.com. It is a demo of HTML3D's capabilities, showcasing a recursive game-within-a-game.
-<br />
 All the code is in the html file. You can use this file as a starting point for creating your own 3D scenes.
 
 **src/HTML3D.js**<br>
