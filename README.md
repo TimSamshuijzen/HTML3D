@@ -1,5 +1,5 @@
 # HTML3D
-HTML3D is a JavaScript library for creating 3D scenes with HTML elements, positioned in space using CSS 3D transforms.
+HTML3D is a JavaScript library for creating 3D scenes with HTML and CSS 3D transforms.
 
 See the demo at: https://html3d.com
 
