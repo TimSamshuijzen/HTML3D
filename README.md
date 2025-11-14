@@ -6,7 +6,7 @@ https://html3d.com
 
 ![HTML3D demo](./images/html3d_demo.png?raw=true "HTML3D demo")
 
-It works in Chromium-based browsers and Safari, but unfortunately not in Firefox.
+The demo works in Chromium-based browsers and Safari. The demo is too large and intensive for Firefox.
 
 **src/index.html**<br />
 This html file is the homepage of html3d.com. It is a demo of HTML3D's capabilities, showcasing a recursive game-within-a-game.
