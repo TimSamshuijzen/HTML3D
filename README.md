@@ -4,9 +4,9 @@ HTML3D is a JavaScript library for creating 3D scenes with HTML and CSS 3D trans
 See the demo:<br />
 https://html3d.com
 
-![HTML3D demo](./images/html3d_demo.png?raw=true "HTML3D demo")
+The demo works in Chromium-based browsers and Safari. The demo does not work in Firefox.
 
-The demo works in Chromium-based browsers and Safari. The demo is too large and intensive for Firefox.
+![HTML3D demo](./images/html3d_demo.png?raw=true "HTML3D demo")
 
 **src/index.html**<br />
 This html file is the homepage of html3d.com. It is a demo of HTML3D's capabilities, showcasing a recursive game-within-a-game.
