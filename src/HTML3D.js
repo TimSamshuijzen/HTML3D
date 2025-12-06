@@ -551,13 +551,7 @@ class HTML3D {
       return this;
     }
     toCSSMatrixString() {
-      const e = this.elements;
-      return 'matrix3d(' +
-        e[0] + ',' + e[1] + ',' + e[2] + ',' + e[3] + ',' +
-        e[4] + ',' + e[5] + ',' + e[6] + ',' + e[7] + ',' +
-        e[8] + ',' + e[9] + ',' + e[10] + ',' + e[11] + ',' +
-        e[12] + ',' + e[13] + ',' + e[14] + ',' + e[15] +
-        ')';
+      return `matrix3d(${this.elements.join(',')})`;
     }
   }
   HTML3D.BoundingBox = class BoundingBox {
