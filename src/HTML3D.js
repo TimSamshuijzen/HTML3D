@@ -55,7 +55,7 @@ class HTML3D {
     const innerWidth = this.container.clientWidth;
     const innerHeight = this.container.clientHeight;
     const focalLength = (0.5 * innerHeight) / Math.tan((this.camera.fov * 0.5 * Math.PI) / 180);
-    this.camera.viewMatrix.setMatrix(this.camera.worldMatrix).invert();
+    this.camera.render();
     this.sceneContainer.style.transform = `perspective(${focalLength}px) translateZ(${focalLength}px) ${this.camera.viewMatrix.toCSSMatrixString()} translate(${innerWidth / 2}px, ${innerHeight / 2}px)`;
     for (let i = 0, c = this.panels.length; i < c; i++) {
       this.panels[i].render();
@@ -180,6 +180,9 @@ class HTML3D {
       this.worldMatrix.setTranslate(this.x, this.y, this.z);
       this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateY(this.rotationY));
       this.worldMatrix.multiply(new HTML3D.Matrix4().setRotateX(this.rotationX));
+    }
+    render() {
+      this.viewMatrix.setMatrix(this.worldMatrix).invert();
     }
   };
   HTML3D.Panel = class Panel {
