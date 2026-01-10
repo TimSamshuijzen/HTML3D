@@ -5,7 +5,7 @@ See the demo:<br />
 https://html3d.com
 
 The demo showcases a fully recursive game-within-a-game.<br>
-The demo works in Chromium-based browsers and Safari. Unfortunately, the demo is too large for Firefox to handle.
+The demo works in Chrome, but not so good in Safari and Firefox unfortunately.
 
 ![HTML3D demo](./images/html3d_demo.png?raw=true "HTML3D demo")
 
