@@ -3153,7 +3153,7 @@ if (window.location.protocol === 'https:') {
   });
   headerpanel.appendChild(headerpaneldownloadlink);
   const downloadlink = document.createElement('div');
-  downloadlink.title = 'HTML3D demo is a portable html app. All the JavaScript code is in the html file.\nClick here to download the html file, run it local, tinker with the code, and create your own scenes.';
+  downloadlink.title = 'Download HTML3D demo html file with all the JavaScript code included.\nDownload the html file if you want to run it offline, tinker with the code, and create your own scenes.';
   Object.assign(downloadlink.style, {
     position: 'absolute',
     left: '10px',
@@ -3190,7 +3190,7 @@ if (window.location.protocol === 'https:') {
     lineHeight: '24px',
     whiteSpace: 'nowrap'
   });
-  downloadlink_text.innerHTML = 'Download HTML3D demo';
+  downloadlink_text.innerHTML = '';
   downloadlink.appendChild(downloadlink_text);
   let downloaded = false;
   downloadlink.addEventListener('click', async () => {
