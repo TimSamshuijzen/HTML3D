@@ -838,7 +838,7 @@ const SCENE = {
           camera.y += finalMove.y;
           camera.z += finalMove.z;
           // When camera.z is between 8200 and 8209, the INP (Interaction to Next Paint) in Chrome is very slow.
-          if ((camera.z >= 8200 && camera.z <= 8209)) {
+          if ((camera.z >= 8200) && (camera.z <= 8209)) {
             camera.z = 8199;
           }
         }
