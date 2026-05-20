@@ -734,6 +734,7 @@ const SCENE = {
     init(html3d, camera) {
       camera.userData.keyboard = {};
       document.addEventListener('keydown', (event) => {
+        if (event.repeat) return;
         if ((document.activeElement.tagName !== 'TEXTAREA') && (document.activeElement.tagName !== 'INPUT')) {
           camera.userData.keyboard[event.code] = true;
           // When keyup event is not triggered, help user get out of the stuck keys situation.
@@ -836,6 +837,10 @@ const SCENE = {
           camera.x += finalMove.x;
           camera.y += finalMove.y;
           camera.z += finalMove.z;
+          // prevents slow INP (Interaction to Next Paint) in Chrome, for some reason.
+          if (Math.abs(camera.z - 8200) < 1.5) {
+            camera.z += finalMove.z;
+          }
         }
       }
       if (moved) {
